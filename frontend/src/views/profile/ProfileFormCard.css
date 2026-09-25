@@ -1,0 +1,309 @@
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.form-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.field__label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.field__hint {
+  margin-top: calc(-1 * var(--space-xs));
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.field__suffix {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+.field__control :deep(.el-input__wrapper) {
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 1px var(--color-border) inset;
+}
+
+.field__control :deep(.el-input__inner) {
+  height: 52px;
+  font-size: 1rem;
+}
+
+.field__control--readonly :deep(.el-input__wrapper) {
+  background-color: var(--color-bg-warm);
+}
+
+.field__control--readonly :deep(.el-input__inner) {
+  color: var(--color-text-secondary);
+  -webkit-text-fill-color: var(--color-text-secondary);
+}
+
+.num-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.option-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.option-group--stacked {
+  flex-direction: column;
+}
+
+.option-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 88px;
+  min-height: 48px;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--color-text);
+  text-align: center;
+  cursor: pointer;
+  background-color: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.option-group--stacked .option-btn {
+  width: 100%;
+  text-align: left;
+}
+
+.option-btn__label {
+  font-weight: 600;
+}
+
+.option-btn__desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.option-btn:hover {
+  border-color: var(--color-primary);
+}
+
+.option-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.option-btn.is-active {
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-card));
+  border-color: var(--color-primary);
+}
+
+.option-btn.is-active .option-btn__desc {
+  color: var(--color-primary-dark);
+}
+
+.tag-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  min-height: 52px;
+  padding: 8px 14px;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease;
+}
+
+.tag-editor:focus-within {
+  border-color: var(--color-primary);
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: 12px;
+  font-size: 0.95rem;
+  color: var(--color-primary-dark);
+  background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg-card));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+  border-radius: 999px;
+}
+
+.tag-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 1rem;
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+}
+
+.tag-chip__remove:hover {
+  color: var(--color-danger);
+}
+
+.tag-chip__remove:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.tag-editor__input {
+  flex: 1 1 140px;
+  min-width: 140px;
+  min-height: 40px;
+  padding: 0;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+
+.tag-editor__input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* 常见忌口/过敏大字 chips */
+.tag-quick-label {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.tag-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.tag-quick__chip {
+  min-height: 48px;
+  padding: 0 var(--space-lg);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  background-color: var(--color-bg-card);
+  border: 2px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.tag-quick__chip:hover {
+  border-color: var(--color-primary);
+}
+
+.tag-quick__chip.is-active {
+  color: var(--color-text-inverse);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.history-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--color-bg-warm);
+  border-radius: var(--radius-md);
+}
+
+.history-row {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.history-row__label {
+  flex-shrink: 0;
+  width: 7em;
+  color: var(--color-text-secondary);
+}
+
+.history-row__value {
+  color: var(--color-text);
+}
+
+.history-row--switch {
+  justify-content: space-between;
+}
+
+.med-switch {
+  --el-switch-on-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.history-note {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+.form-card__save {
+  width: 100%;
+  min-height: 56px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 768px) {
+  .num-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .option-btn {
+    flex: 1 1 calc(50% - 8px);
+  }
+}
+
+/* 桌面宽屏：表单控件限制在易读易点的宽度内，不再横跨整个内容区（最宽约 1000px）。
+   只收窄表单卡本身，评估/血压记录等表格类卡片仍占满整行 */
+@media (min-width: 1200px) {
+  .form-card {
+    max-width: 720px;
+  }
+}

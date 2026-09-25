@@ -1,0 +1,266 @@
+/* 底部输入区：固定在主区底部（flex 末位），居中 max-width 780，发送条 ≥56px。 */
+
+.composer {
+  flex: none;
+  padding: var(--space-sm) var(--space-lg) calc(var(--space-sm) + env(safe-area-inset-bottom, 0px));
+  background-color: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
+}
+
+.composer__inner {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* 已选附件 */
+.composer__atts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.composer__att {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  min-height: 44px;
+  /* 删除热区右扩到 ≥44px，给文字/缩略图留出避让空间 */
+  padding: 4px 42px 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.composer__att-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.composer__att-file-icon {
+  flex: none;
+  display: inline-flex;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+}
+
+.composer__att-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer__att-size {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.composer__att-remove {
+  /* 点击热区 ≥44px（视觉图标仍为原大小，整块右上区域都可点） */
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.composer__att-remove:hover {
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg-on-white);
+}
+
+/* 录音状态 */
+.composer__listening {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--color-danger);
+}
+
+.composer__listening-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-danger);
+}
+
+/* 输入条 */
+.composer__bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-height: 56px;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.composer__file-input {
+  display: none;
+}
+
+.composer__icon-btn,
+.composer__mic {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.composer__icon-btn:hover,
+.composer__mic:hover {
+  background-color: var(--color-bg-warm);
+  color: var(--color-primary);
+}
+
+.composer__icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 录音中：红色脉动 */
+.composer__mic.is-recording {
+  color: #ffffff;
+  background-color: var(--color-danger);
+  animation: mic-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(217, 48, 37, 0);
+  }
+}
+
+.composer__textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 180px;
+  margin: 0;
+  padding: 10px 6px;
+  border: none;
+  outline: none;
+  resize: none;
+  background-color: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+
+.composer__textarea::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* 发送：主色圆形；停止：红白胶囊。均落在 56px 条内。 */
+.composer__send {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.composer__send:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.composer__send:disabled {
+  background-color: var(--color-border);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: not-allowed;
+}
+
+.composer__stop {
+  flex: none;
+  height: 48px;
+  padding: 0 var(--space-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--color-danger);
+  border-radius: 999px;
+  background-color: #ffffff;
+  color: var(--color-danger);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.composer__stop:hover {
+  background-color: var(--color-danger-bg-on-white);
+}
+
+/* 麦克风被拒/不支持时常驻解锁指引：小字号但随适老基准放大 */
+.composer__mic-blocked {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 6px 4px 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+
+.composer__mic-blocked-icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-warning-text);
+}
+
+/* 底部提示小字：用尺度令牌，跟随 125% 适老基准放大（不再写 12px 物理字号） */
+.composer__hint {
+  margin: 6px 4px 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* 可点元素的焦点环统一走 components.css 全局 :focus-visible（2px primary 外环） */
+
+@media (prefers-reduced-motion: reduce) {
+  .composer__mic.is-recording {
+    animation: none;
+  }
+}

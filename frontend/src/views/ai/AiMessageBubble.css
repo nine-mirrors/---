@@ -1,0 +1,218 @@
+/* 气泡内部：附件缩略图 / 文件 chip / 赞踩操作行。气泡骨架类 .msg-bubble* 与
+   AiMessageList.css 同名（scoped 父样式会命中本组件根节点），这里只补内部样式。 */
+
+.msg-bubble__text {
+  margin: 0;
+  word-break: break-word;
+}
+
+/* 安全迷你 markdown（h() VNode 不带 scoped 作用域，统一 :deep 命中）：
+   空行分段 / 段落内换行 / 无序·有序列表 / 加粗 */
+.msg-bubble :deep(.ai-md__p) {
+  margin: 0 0 0.5em;
+  white-space: pre-wrap;
+  line-height: var(--line-height-base, 1.6);
+}
+
+.msg-bubble :deep(.ai-md__p:last-child) {
+  margin-bottom: 0;
+}
+
+.msg-bubble :deep(.ai-md__ul),
+.msg-bubble :deep(.ai-md__ol) {
+  margin: 0 0 0.5em;
+  padding-left: 1.5em;
+}
+
+.msg-bubble :deep(.ai-md__ul:last-child),
+.msg-bubble :deep(.ai-md__ol:last-child) {
+  margin-bottom: 0;
+}
+
+.msg-bubble :deep(.ai-md__li) {
+  margin: 2px 0;
+  white-space: pre-wrap;
+  line-height: var(--line-height-base, 1.6);
+}
+
+.msg-bubble :deep(.ai-md__strong) {
+  font-weight: 700;
+}
+
+/* 急症语境下的唯一可点链接：仅 tel:120，红色加粗下划线，点击热区 ≥40px。
+   气泡在白色弹层表面，红底收口 --color-danger-bg-on-white */
+.msg-bubble :deep(.ai-md__tel) {
+  display: inline-block;
+  min-height: 40px;
+  padding: 0 6px;
+  border-radius: 8px;
+  color: var(--color-danger);
+  font-weight: 700;
+  line-height: 40px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background-color: var(--color-danger-bg-on-white);
+}
+
+.msg-bubble :deep(.ai-md__tel):active {
+  background-color: color-mix(in srgb, var(--color-danger) 16%, #ffffff);
+}
+
+.msg-att {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.msg-att:empty {
+  margin-bottom: 0;
+}
+
+/* 图片缩略图：84px 圆角，点击 el-image 全屏预览 */
+.msg-att__img {
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.msg-att__img-el {
+  width: 84px;
+  height: 84px;
+  display: block;
+  cursor: zoom-in;
+}
+
+.msg-att__img-el :deep(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.msg-att__img-missing {
+  width: 84px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.4rem;
+}
+
+/* 文件 chip */
+.msg-filechip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  min-height: 36px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-warm);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.msg-filechip__icon {
+  flex: none;
+}
+
+.msg-filechip__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msg-filechip__size {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+/* user 气泡（主色底）上的 chip 反白处理 */
+.msg-bubble--user .msg-filechip {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: var(--color-text-inverse);
+}
+
+.msg-bubble--user .msg-filechip__size {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* assistant 操作行 */
+.msg-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.msg-action {
+  /* 带文字胶囊：高度仍 ≥44px，适老点击热区不缩小 */
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  border-radius: 22px;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.msg-action__label {
+  line-height: 1;
+}
+
+.msg-action:hover {
+  background-color: var(--color-bg-warm);
+  color: var(--color-text);
+}
+
+.msg-action.is-active-up {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9, #e3f0eb);
+}
+
+/* 朗读中：主色高亮胶囊，让老人知道"正在读这条" */
+.msg-action.is-active-speak {
+  color: var(--color-primary);
+  background-color: var(--el-color-primary-light-9, #e3f0eb);
+}
+
+.msg-action.is-active-down {
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg-on-white);
+}
+
+/* 赞/踩/重新生成均为 <button>，焦点环统一走 components.css 全局 :focus-visible */
+
+.msg-regenerate {
+  min-height: 44px;
+  margin-left: 4px;
+  padding: 0 var(--space-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.msg-regenerate:hover {
+  color: var(--color-primary);
+  background-color: var(--color-bg-warm);
+}

@@ -1,0 +1,155 @@
+/* 消息列布局与气泡骨架（附件/反馈按钮样式在 AiMessageBubble.css） */
+
+.msg-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.msg-row.is-user {
+  justify-content: flex-end;
+}
+
+.msg-row.is-ai {
+  justify-content: flex-start;
+}
+
+.msg-row__avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* 气泡骨架（AiMessageBubble 根节点也用 msg-bubble 类，scoped 下父级选择器可命中子组件根节点） */
+.msg-bubble {
+  max-width: min(84%, 640px);
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: 1.05rem;
+  line-height: var(--line-height-base);
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: var(--shadow-sm);
+}
+
+.msg-bubble--user {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-bottom-right-radius: 4px;
+}
+
+.msg-bubble--ai {
+  background-color: #ffffff;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 4px;
+}
+
+/* pending 三点动画 */
+.msg-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.msg-typing__text {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.msg-typing__dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.msg-typing__dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  animation: msg-dot-bounce 1.2s infinite ease-in-out;
+}
+
+.msg-typing__dots i:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.msg-typing__dots i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes msg-dot-bounce {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+/* 失败提示 */
+.msg-error {
+  max-width: min(84%, 640px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background-color: #fdf3f2;
+  border: 1px solid #f3c2bd;
+  border-radius: var(--radius-md);
+}
+
+.msg-error__text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: var(--line-height-base);
+  color: var(--color-danger);
+}
+
+.msg-error__btn {
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  color: var(--color-danger);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.msg-error__btn:hover {
+  background-color: var(--color-danger-bg-on-white);
+}
+
+/* focus-visible 统一吃 components.css 全局 2px primary 外环，不再私有覆盖 */
+
+@media (prefers-reduced-motion: reduce) {
+  .msg-typing__dots i {
+    animation: none;
+    opacity: 0.6;
+  }
+}

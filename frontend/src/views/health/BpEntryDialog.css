@@ -1,0 +1,587 @@
+/* —— 弹层自身：让 body 成为滚动容器，底部操作区才能 sticky 贴底 —— */
+.bp-entry-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+  margin: 24px auto;
+}
+
+.bp-entry-dialog :deep(.el-dialog__header) {
+  flex-shrink: 0;
+}
+
+.bp-entry-dialog :deep(.el-dialog__body) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  /* 显式钉住 padding，sticky 底栏用等宽负边距吃满整行 */
+  padding: 20px;
+}
+
+.bp-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.bp-form__prefill {
+  margin: 0;
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--color-warning-text);
+  background-color: var(--color-warning-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, #ffffff);
+  border-radius: var(--radius-sm);
+}
+
+.bp-form__spec {
+  padding: var(--space-md);
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-warm);
+  border-radius: var(--radius-sm);
+}
+
+.bp-form__spec p {
+  margin: 0;
+}
+
+.bp-form__spec p + p {
+  margin-top: var(--space-xs);
+}
+
+.bp-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.bp-form__section-title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.bp-form__section-sub {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.bp-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.bp-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.bp-input__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.bp-input__optional {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.bp-input__group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.bp-input__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 56px;
+  font-size: 1.4rem;
+  color: var(--color-primary);
+  background-color: var(--color-bg-warm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.bp-input__btn:hover,
+.bp-input__btn:focus-visible {
+  background-color: var(--el-color-primary-light-9);
+  outline: 2px solid var(--el-color-primary-light-5);
+  outline-offset: 1px;
+}
+
+.bp-input__field {
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  padding: 0 var(--space-md);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+  background-color: #fff;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.bp-input__field:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.bp-input__unit {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.bp-input__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
+
+.bp-input__hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: #6b675e;
+}
+
+.bp-form__warn {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-warning-text);
+  background-color: var(--color-warning-bg-on-white);
+  border-radius: var(--radius-sm);
+}
+
+.bp-form__period {
+  display: flex;
+}
+
+.bp-form__period :deep(.el-radio-button__inner) {
+  min-height: 48px;
+  padding: 0 var(--space-xl);
+  font-size: var(--font-size-base);
+}
+
+.bp-form__period-note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* 臂别 / 脉搏 大选项按钮（点击区 ≥56px，再点一次可取消） */
+.bp-form__seg {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.bp-form__seg--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bp-form__seg-btn {
+  min-height: 56px;
+  padding: 0 var(--space-md);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  background-color: var(--color-bg-warm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.bp-form__seg-btn:hover {
+  border-color: var(--color-primary);
+}
+
+/* 键盘焦点环恢复全局约定：2px primary（components.css 的 button:focus-visible），
+   不再用 outline:none 吃掉，也不自造弱边框 */
+.bp-form__seg-btn.is-active {
+  color: var(--color-text-inverse, #fff);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* 红旗症状 chips（大按钮，点击区 ≥44px，可多选切换） */
+.bp-form__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.bp-form__chip {
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text);
+  background-color: var(--color-bg-warm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.bp-form__chip:hover {
+  border-color: var(--color-danger);
+}
+
+.bp-form__chip.is-active {
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg-on-white);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, #ffffff);
+}
+
+/* 点中红旗症状后的醒目红色提示行（tel:120 链接点击区 ≥44px） */
+.bp-form__symptom-warn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: var(--space-md);
+  background-color: var(--color-danger-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, #ffffff);
+  border-radius: var(--radius-sm);
+}
+
+.bp-form__symptom-warn-text {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-danger-text);
+}
+
+.bp-form__symptom-call {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  background-color: var(--color-danger);
+  border-radius: var(--radius-sm);
+}
+
+.bp-form__symptom-call:hover,
+.bp-form__symptom-call:focus-visible {
+  background-color: var(--color-danger-text);
+}
+
+.bp-form__low-note {
+  margin: 0;
+  padding: var(--space-md);
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+  color: var(--color-info-text);
+  background-color: var(--color-info-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-info-text) 25%, #ffffff);
+  border-radius: var(--radius-sm);
+}
+
+.bp-form__low-note strong {
+  color: var(--color-info-text);
+}
+
+/* 孤立性低压（高压正常、仅低压低）：中性说明而非警告 */
+.bp-form__low-note--neutral {
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-warm);
+  border-color: var(--color-border);
+}
+
+.bp-form__elder-note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* —— 底部 sticky 操作区（相对 el-dialog__body 滚动区贴底，长表单常显） —— */
+.bp-form__actions {
+  position: sticky;
+  bottom: -20px;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  /* 吃满 body 两侧/底部 20px padding，形成整行白底栏 */
+  margin: 0 -20px;
+  padding: var(--space-md) 20px;
+  background-color: #fff;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 12px rgba(90, 80, 60, 0.1);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.bp-form__actions :deep(.el-button),
+.bp-form__actions .el-button {
+  min-height: 56px;
+}
+
+/* 保存结果 */
+.bp-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.bp-result__time {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.bp-result__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.bp-result__num {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-text);
+}
+
+.bp-result__slash {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.bp-result__unit {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.bp-result__hr {
+  margin-left: var(--space-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.bp-result__tip {
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+}
+
+/* 五套 tip：米白弹层表面统一走 *-bg-on-white / 文字 token / 边框 color-mix 25% */
+.bp-result__tip--green {
+  background-color: var(--color-success-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-success) 25%, #ffffff);
+}
+
+.bp-result__tip--yellow {
+  background-color: var(--color-warning-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, #ffffff);
+}
+
+/* urgent 档没有独立橙色 token，收口到警告色 */
+.bp-result__tip--orange {
+  background-color: var(--color-warning-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, #ffffff);
+}
+
+.bp-result__tip--red {
+  background-color: var(--color-danger-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, #ffffff);
+}
+
+.bp-result__tip--low {
+  background-color: var(--color-info-bg-on-white);
+  border: 1px solid color-mix(in srgb, var(--color-info-text) 25%, #ffffff);
+}
+
+.bp-result__tip-title {
+  margin: 0 0 var(--space-sm);
+  font-size: calc(var(--font-size-base) * 1.1);
+  font-weight: 700;
+}
+
+.bp-result__tip--green .bp-result__tip-title {
+  color: var(--color-success-text);
+}
+
+.bp-result__tip--yellow .bp-result__tip-title,
+.bp-result__tip--orange .bp-result__tip-title {
+  color: var(--color-warning-text);
+}
+
+.bp-result__tip--red .bp-result__tip-title {
+  color: var(--color-danger-text);
+}
+
+.bp-result__tip--low .bp-result__tip-title {
+  color: var(--color-info-text);
+}
+
+.bp-result__tip-text {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.bp-result__q {
+  margin: var(--space-sm) 0 var(--space-xs);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.bp-result__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.bp-result__flags :deep(.el-checkbox) {
+  height: var(--control-touch);
+  margin-right: 0;
+  font-size: var(--font-size-base);
+}
+
+.bp-result__call {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 var(--space-xl);
+  font-size: calc(var(--font-size-base) * 1.2);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  background-color: var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.bp-result__call:hover,
+.bp-result__call:focus-visible {
+  background-color: var(--color-danger-text);
+  outline: 3px solid color-mix(in srgb, var(--color-danger) 30%, #ffffff);
+  outline-offset: 2px;
+}
+
+/* “我没有不舒服”次要按钮：点击区 ≥44px */
+.bp-result__minor {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: var(--space-sm);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.bp-result__minor:hover,
+.bp-result__minor:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.bp-result__pulse-warn {
+  margin: 0;
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--color-warning-text);
+  background-color: var(--color-warning-bg-on-white);
+  border-radius: var(--radius-sm);
+}
+
+.bp-result__warn {
+  margin: var(--space-sm) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+.bp-result__deep {
+  padding: var(--space-md);
+  background-color: var(--color-warning-bg-on-white);
+  border-radius: var(--radius-sm);
+}
+
+.bp-result__deep p {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  color: var(--color-warning-text);
+}
+
+.bp-result__deep strong {
+  color: var(--color-warning-strong);
+}
+
+/* —— 结果页底部 sticky 操作区：急症时 120 红钮与“好的”并排常显 —— */
+.bp-result__actions {
+  position: sticky;
+  bottom: -20px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin: 0 -20px;
+  padding: var(--space-md) 20px;
+  background-color: #fff;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 12px rgba(90, 80, 60, 0.1);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.bp-result__actions .bp-result__call {
+  flex: 1;
+  width: auto;
+}
+
+.bp-result__actions .el-button {
+  min-height: 56px;
+}
+
+@media (max-width: 480px) {
+  .bp-form__row {
+    grid-template-columns: 1fr;
+  }
+}

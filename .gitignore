@@ -1,0 +1,33 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+backend/.venv/
+.env
+.env.local
+*.db
+*.sqlite3
+chroma_db/
+backend/storage/
+
+# ===== Node / 前端 =====
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+
+# ===== 模型与数据（训练用，不入库） =====
+datasets/
+*.pth
+*.onnx
+backend/models/weights/
+
+# ===== 编辑器 / 系统 =====
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# ===== 临时调试产物（布局巡检截图/脚本，不入库） =====
+layout-inspection/

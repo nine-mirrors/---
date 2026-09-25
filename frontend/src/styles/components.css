@@ -1,0 +1,124 @@
+/* 表现层跨组件共享基础类（仅被 ≥3 个组件复用），类名统一 .nd- 前缀 */
+
+/* 纸感卡片：米白纸底、圆润大卡片、柔阴影 */
+.nd-card {
+  position: relative;
+  padding: var(--space-lg);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 可点击卡片的统一交互反馈（hover 上浮 + 阴影加深） */
+.nd-card-interactive {
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.nd-card-interactive:hover,
+.nd-card-interactive:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-base);
+}
+
+.nd-card-interactive:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- 适老：全局兜底焦点环（键盘可见，鼠标点击不出现） ---------- */
+button:focus-visible,
+[role='switch']:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- 适老：ElMessage 全局覆盖（米白卡片观感、≥48px、文字垂直居中） ---------- */
+.el-message {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  max-width: min(92vw, 480px);
+  padding: 10px 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* 文案与图标垂直居中，关闭按钮点击区不受影响 */
+.el-message .el-message__content {
+  display: flex;
+  align-items: center;
+}
+
+/* ---------- 适老：ElMessageBox 全局覆盖（删菜/断设备/发图授权/症状二次确认等确认框）。
+   弹层 teleport 到 body，本文件经 main.ts 全局引入，无需 :deep。 ---------- */
+.el-message-box {
+  width: min(420px, 92vw);
+  max-width: 92vw;
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-lg);
+}
+
+.el-message-box__header {
+  padding: 0;
+}
+
+.el-message-box__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+/* 右上角关闭 X：点击区 ≥44px */
+.el-message-box__headerbtn {
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 44px;
+  height: 44px;
+}
+
+.el-message-box__content {
+  padding-top: var(--space-md);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.el-message-box__message {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.el-message-box__btns {
+  padding-top: var(--space-lg);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+/* 底部按钮：最小高度 48px、1rem 字号，适老易点 */
+.el-message-box__btns .el-button {
+  min-height: 48px;
+  padding: 0 var(--space-lg);
+  font-size: 1rem;
+  border-radius: var(--radius-sm);
+}
+
+/* danger 确认钮保持红色（删除等破坏性操作） */
+.el-message-box__btns .el-button--danger,
+.el-message-box__btns .el-button--danger:focus,
+.el-message-box__btns .el-button--danger:hover {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-text-inverse);
+}

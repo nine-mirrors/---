@@ -1,0 +1,108 @@
+@import './tokens.css';
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-page-body);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-top: 0;
+}
+
+/* ---------- 布局容器 ---------- */
+.page-container {
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: var(--space-lg);
+}
+
+/* 超窄屏（≤360px，如 320px 老机型）：水平页边距 16px→12px，
+   为网格卡片多让出 8px，全局兜底防横向溢出（竖向内边距不变） */
+@media (max-width: 360px) {
+  .page-container {
+    padding-right: var(--space-md);
+    padding-left: var(--space-md);
+  }
+}
+
+/* ---------- 工具类：可点元素最小触控尺寸 ---------- */
+.touch-target {
+  min-width: var(--control-touch);
+  min-height: var(--control-touch);
+}
+
+/* ---------- 工具类：清除 ul 默认样式 ---------- */
+.list-unstyled {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- 柔和滚动条 ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(90, 80, 60, 0.25) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(90, 80, 60, 0.25);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(90, 80, 60, 0.4);
+}
+
+/* ---------- 适老：系统「减少动态效果」时收敛动画 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

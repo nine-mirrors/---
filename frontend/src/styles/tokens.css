@@ -1,0 +1,97 @@
+:root {
+  /* 基准字号：125% 使 1rem = 20px（浏览器默认 16px 时），适老放大 */
+  font-size: 125%;
+
+  /* 品牌色 */
+  --color-primary: #0e7a5f;
+  --color-primary-dark: #0a5f4b;
+  --color-danger: #d93025;
+  --color-warning: #f59e0b;
+  --color-success: #1e8e3e;
+
+  /* 语义状态色：在米纸底上当文字/线性图标用（对比度 ≥4.5:1）；
+     上方原色仅用于装饰圆点、色条、图表、加粗大字与底色混合 */
+  --color-warning-text: #8a4b08;
+  --color-warning-strong: #a16207;
+  --color-success-text: #176c2f;
+  --color-info-text: #1d4ed8;
+  --color-danger-text: #b3261e;
+  --color-warning-bg: color-mix(in srgb, #f59e0b 10%, #fffdf7);
+  --color-danger-bg: color-mix(in srgb, #d93025 8%, #fffdf7);
+  --color-success-bg: color-mix(in srgb, #1e8e3e 10%, #fffdf7);
+  --color-info-bg: color-mix(in srgb, #1d4ed8 8%, #fffdf7);
+  /* 纯白表面（el-dialog/el-popover/ElMessageBox）专用底色，避免米白混色进弹层发黄 */
+  --color-warning-bg-on-white: color-mix(in srgb, #f59e0b 12%, #ffffff);
+  --color-danger-bg-on-white: color-mix(in srgb, #d93025 8%, #ffffff);
+  --color-success-bg-on-white: color-mix(in srgb, #1e8e3e 10%, #ffffff);
+  --color-info-bg-on-white: color-mix(in srgb, #1d4ed8 8%, #ffffff);
+
+  /* 纸感底色 */
+  --color-bg: #faf7f0;
+  --color-bg-card: #fffdf7;
+  --color-bg-warm: #f3ede1;
+
+  /* 文字（与纸底对比 ≥ 4.5:1） */
+  --color-text: #2b2a26;
+  --color-text-secondary: #6b675e;
+  --color-text-inverse: #ffffff;
+
+  /* 边框 */
+  --color-border: #e5ddcd;
+
+  /* 字号 */
+  --font-size-xs: 0.8125rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-xxl: 2rem;
+  --font-page-body: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+
+  /* 行高 */
+  --line-height-base: 1.6;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* 柔和阴影 */
+  --shadow-sm: 0 1px 3px rgba(90, 80, 60, 0.08);
+  --shadow-base: 0 4px 16px rgba(90, 80, 60, 0.1);
+  --shadow-md: 0 6px 22px rgba(90, 80, 60, 0.12);
+  --shadow-lg: 0 8px 28px rgba(90, 80, 60, 0.14);
+  --shadow-primary: 0 8px 20px color-mix(in srgb, var(--color-primary) 24%, transparent);
+
+  /* 控件与布局 */
+  --control-height: 56px;
+  --control-touch: 44px;
+  --layout-max: 1280px;
+  --sider-width: 200px;
+  --sider-width-collapsed: 72px;
+  --tabbar-height: 64px;
+
+  /* Element Plus 主题对齐品牌色 */
+  --el-color-primary: var(--color-primary);
+  --el-color-primary-light-3: #3f9b83;
+  --el-color-primary-light-5: #6fb5a1;
+  --el-color-primary-light-7: #a3cfc2;
+  --el-color-primary-light-8: #c0dfd6;
+  --el-color-primary-light-9: #e3f0eb;
+  --el-color-primary-dark-2: var(--color-primary-dark);
+  --el-border-radius-base: var(--radius-sm);
+
+  /* 适老：Element Plus 按钮高度（主按钮 large ≥56px，默认 ≥44px 点击区） */
+  --el-button-large-height: 56px;
+  --el-button-default-height: 48px;
+  --el-button-small-height: 36px;
+  --el-button-large-font-size: 1.1rem;
+}
