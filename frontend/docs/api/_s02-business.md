@@ -558,7 +558,9 @@ mock 专属写入侧（真实模式 no-op）：`ensureDeviceData(profile)`（播
 1. **AI 必须后端代理**：浏览器直连会泄露模型密钥。正式环境请后端提供代理（建议 `/api/ai/chat/completions`），并可选提供 `POST /api/ai/feedback`（赞踩反馈，前端失败静默；当前仅写本地 `ai_feedback_v1:<uid>`）。
 2. **手动体征端点**：见 8.2。
 3. **批量重置端点（可选）**：前端"重置当前账号数据"在真实模式只清本机缓存；如需服务端联动，建议 `DELETE /api/users/me/data`（保留画像）。
-4. **不要建血糖字段**：R2 起产品只聚焦高血压，无 glucose/GL/糖尿病相关数据。
+4. **不要建血糖字段、不要实现 GL 规则**：R2 起产品只聚焦高血压，无 glucose/GL/糖尿病相关数据。规则引擎中依赖 t2d 的 3 条规则与 `T2D_GL_THRESHOLD_EXCEEDED` 一律删除；前端有测试断言 `gl/glucose` 字段不存在、画像读取时剥离 `t2dStatus/sweetFreq`。GI 数据集仅作静态资料，不产生规则。规则维度以 `src/utils/nutrition.ts` 为准：钠/钾/蛋白/蔬菜/DASH 综合五维。
 5. **食材库 id 同源**：前端内置 `src/mock/foods.ts`（提取自《中国食物成分表第6版》转录集），真实模式下识别结果展示、份量快捷档、手动搜索兜底都按 id 查这份表。`/api/foods/search` 与 `/api/recognize` 返回的食物 `id` 需与前端食材库同源一致，否则会出现有 id 无名称/无份量档。
 6. **部署开关**：联调/正式部署时将 `.env.production` 的 `VITE_USE_MOCK` 改为 `false` 并删除 `VITE_ALLOW_MOCK_BUILD=true` 放行行。
 7. **设备连接状态**（蓝牙血压计/手环/体脂秤/餐盘的连接/断开）纯本机维护，无后端端点；`GET /api/device-data` 只回传体征数据。
+8. **存储与多用户隔离（2026-09-26 决议）**：用户产生的数据全部进 SQLite 关系表（建议 SQLAlchemy），不要用 JSON 文件按 uid 命名空间——那只是前端 localStorage mock 的模拟方式。所有业务表带 `uid` 外键（`REFERENCES users(id) ON DELETE CASCADE`）并记得 `PRAGMA foreign_keys=ON`；所有查询强制 `WHERE uid = 当前用户`。JSON 文件只放只读种子（食材库、食谱库）。建议首批表：`users / profiles（一对一，23 字段见 §4）/ meals + meal_items / bp_logs / medication_records / device_days`。
+9. **响应不要 envelope、token 用 JWT**：成功直接返回裸数据，错误体仅 `{code,message}`（§1.2）；JWT HS256、30 天、无 refresh，见 S01 §1.2。

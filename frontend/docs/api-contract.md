@@ -20,7 +20,7 @@
 
 ### 0.2 鉴权
 
-- 注册/登录/验证码登录成功后，后端返回不透明 `token`，前端存入全局键 `ndh_auth_v1`。
+- 注册/登录/验证码登录成功后，后端返回 JWT（见 §0.6 决议 4），前端存入全局键 `ndh_auth_v1`。
 - 除 `register`、`login`、`sms/send`、`login/sms` 外，其余端点需 `Authorization: Bearer <token>`。
 - 401 响应：前端清会话、跳 `/login`、提示"登录已过期，请重新登录"。
 
@@ -48,6 +48,21 @@
 - **移除全部血糖/GL/糖尿病逻辑**：无 `gl`、`glucose`、`t2dStatus`、`sweetFreq` 字段。
 - **新增高血压 DASH 营养数据层**：血压记录、控钾安全、家庭血压口径。
 - `Profile.renalKRestriction` 三态（true/false/null）控制补钾策略。
+
+### 0.6 架构决议（2026-09-26 后端答疑，效力高于根目录 `docs/` 里的 R1 规划资料）
+
+> 根目录 `docs/`（项目资料清单、队员任务要求、Agent 提示词等）是 R1"低钠稳糖"阶段的历史资料，其中"糖尿病规则、GL 阈值、稳糖推荐"等描述**已废弃**。后端实现一律以本契约 + `src/types/index.ts` 为准。
+
+| #   | 问题                         | 决议                                                                                          | 理由/执行要点                                                                                                                                                                                              |
+| --- | ---------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 响应包一层 `{code,data}`？   | **不包。成功裸数据，错误只包 `{code,message}`**                                               | 前端拦截器、全部 mock 与 241 个测试都按裸数据写死；后端尚为空仓，现在改零迁移成本。FastAPI 直接 `return` Pydantic 模型即可，另注册一个全局 exception handler 统一吐 §0.3 错误体，不要加包装中间件          |
+| 2   | 保留 t2d 糖尿病字段？        | **不保留、不入库、不入 DTO**                                                                  | R2.3 产品范围只有高血压。前端读取画像时会主动剥离 `t2dStatus/sweetFreq`（`storage.ts` 迁移名单），后端返回了也会被静默丢弃；规则引擎中 3 条依赖 t2d 的规则直接删除，不要"先留着"                              |
+| 3   | GL（血糖负荷）还算吗？       | **不算。删除 `T2D_GL_THRESHOLD_EXCEEDED` 等全部 GL 规则；任何接口不返回 `gl/glucose` 字段**  | 前端有测试断言响应里不存在 `gl`/`glucose`（`nutrition.spec.ts`）。`data/` 的 GI 数据集与食材表 `gi` 列可作为静态资料保留，但不产生任何规则、评分和话术；DASH 五维为 钠/钾/蛋白/蔬菜/综合                     |
+| 4   | token 方案                   | **JWT（HS256），有效期 30 天，无 refresh token**                                              | 无需会话表/存储，FastAPI 标准做法；前端把 token 当不透明串，两种方案对前端无感，但 JWT 少一张表、少一处清理。细节见 S01 §1.2；登出前端自行丢弃 token，`/api/auth/logout` 返回 `{ok:true}` 即可，无需黑名单 |
+| 5   | 多用户隔离                   | **SQLite 关系表 + `uid` 外键，所有查询强制 `WHERE uid = 当前用户`**                            | JSON 按 uid 命名空间是前端 mock 在 localStorage 里的模拟手段，不要照搬到服务端：无法查询、无法保证完整性。建议用 SQLAlchemy，外键 `uid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE`，打开 FK 约束   |
+| 6   | 血压/服药/餐次存哪           | **全部 SQLite 表**（`bp_logs`、`medication_records`、`meals`、`profiles`、`device_*`）        | JSON 文件只用于**只读静态种子**（食材库、食谱库）。用户产生的数据一律入库，支持 `?from=&to=` 范围查询、倒序、按 id 删除                                                                                    |
+
+**建议首批建表**：`users`（id/phone/name/password_hash/salt/created_at）、`profiles`（uid 一对一，23 字段见 S02 §4）、`meals` + `meal_items`、`bp_logs`、`medication_records`、`device_days`（或 `device_metrics` 长表）。`id` 由服务端生成（如 `bp_`/`med_` 前缀 + uuidhex），餐次表对客户端上送的 `id` 建唯一索引做幂等。
 
 ---
 

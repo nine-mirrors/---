@@ -10,14 +10,26 @@
 - 前端 `axios` 实例 `baseURL` 取环境变量 `VITE_API_BASE_URL`，缺省 `http://127.0.0.1:8000`。
 - 所有端点前缀 `/api/auth/`。
 
-### 1.2 鉴权
+### 1.2 鉴权（JWT，2026-09-26 决议）
 
-- 注册/登录/验证码登录成功后，后端返回不透明 `token`，前端存入 `localStorage` 全局键 `ndh_auth_v1`（结构 `{uid, phone, name, token, loginAt}`）。
+- 注册/登录/验证码登录成功后，后端返回 **JWT**，前端存入 `localStorage` 全局键 `ndh_auth_v1`（结构 `{uid, phone, name, token, loginAt}`）。前端把 token 当不透明串，不解析其内容。
 - 除 `register`、`login`、`sms/send`、`login/sms` 外，其余端点需在请求头携带：
   ```
   Authorization: Bearer <token>
   ```
 - `token` 仅存会话键，不写日志、不拼进 URL。
+
+JWT 规范（后端实现约束）：
+
+| 项          | 约定                                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| 算法        | HS256；密钥从环境变量读取（如 `JWT_SECRET`），严禁硬编码/进前端产物                                 |
+| claims      | `sub` = uid（字符串）、`iat` 签发时间、`exp` 过期时间；不要放手机号等隐私                           |
+| 有效期      | 30 天；**不做 refresh token**（前端无刷新流程，过期后 401 → 重新登录即可）                          |
+| 校验失败    | 缺失/非法/过期一律 401 + `{"code":"UNAUTHORIZED","message":"登录已过期，请重新登录"}`               |
+| 登出        | JWT 无状态、不做黑名单：`/api/auth/logout` 校验 token 后直接返回 `{ok:true}`，前端负责丢弃本地 token |
+| 推荐依赖    | `pyjwt` 或 `python-jose[cryptography]`；Pydantic 模型直接返回 `{token, user}`，**不要包 envelope**  |
+| 密码存储    | PBKDF2/bcrypt 加盐哈希（mock 端用的是 SHA-256+salt，正式后端建议 bcrypt），绝不存明文               |
 
 ### 1.3 统一错误结构
 
@@ -77,7 +89,7 @@
 
 ```json
 {
-  "token": "64位hex或后端不透明串",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1X3h4eCIsImlhdCI6MTc4…（JWT）",
   "user": {
     "uid": "u_xxx",
     "phone": "13800000000",
