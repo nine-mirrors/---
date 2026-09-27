@@ -141,9 +141,11 @@ onBeforeUnmount(clearCloseTimer)
     padding 0.2s ease;
 }
 
-/* 展开：胶囊形态，文字与开关可见；宽度包住内容，不写死 */
+/* 展开：胶囊形态，文字与开关可见；宽度包住内容但不写死，
+   max-width 兜底保证任何屏宽（含 320px 窄屏）下都不探出视口右缘 */
 .speech-toggle.is-open {
   width: auto;
+  max-width: calc(100vw - 24px);
   padding: 0 14px 0 0;
   border-radius: var(--radius-lg);
 }

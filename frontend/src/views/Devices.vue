@@ -197,7 +197,7 @@ async function toggleDevice(device: (typeof DEVICES)[number]) {
 .device-name {
   margin: 0;
   font-size: var(--font-size-lg);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
 }
 

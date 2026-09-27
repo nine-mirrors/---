@@ -118,7 +118,7 @@ function handleKeydown(event: KeyboardEvent) {
 .demo-card__title {
   margin: 0;
   font-size: calc(var(--font-size-base) * 1.1);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
   color: var(--color-text);
 }

@@ -65,7 +65,7 @@ defineProps({
 
 .sub-chip__to {
   font-size: var(--font-size-base);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-primary);
 }
 

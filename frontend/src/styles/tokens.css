@@ -45,7 +45,7 @@
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;
   --font-size-xl: 1.5rem;
-  --font-size-2xl: 1.75rem;
+  /* 注：曾有命名拧着的 --font-size-2xl: 1.75rem（小于 xxl），唯一引用已归并到 xxl */
   --font-size-xxl: 2rem;
   --font-page-body: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
 
@@ -78,6 +78,9 @@
   --sider-width: 200px;
   --sider-width-collapsed: 72px;
   --tabbar-height: 64px;
+  /* 窄屏右下角悬浮件在 tabbar 之上额外占据的避让高度：
+     语音开关 bottom=tabbar+80、高 44 → 顶到 tabbar+124，再加 12px 呼吸余量 */
+  --float-safe-bottom: 136px;
 
   /* Element Plus 主题对齐品牌色 */
   --el-color-primary: var(--color-primary);

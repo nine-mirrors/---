@@ -182,7 +182,7 @@ function targetText(dim: DashDimension): string {
 .dash-card__title {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -214,7 +214,7 @@ function targetText(dim: DashDimension): string {
 
 .dash-dim__value {
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .dash-dim__bar {
@@ -303,14 +303,14 @@ function targetText(dim: DashDimension): string {
   gap: var(--space-xs);
   margin: 0 0 var(--space-xs);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-text);
 }
 
 .lifestyle-tip__badge {
   padding: 2px 8px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-warning-text, #92400e);
   background-color: color-mix(in srgb, var(--color-warning) 18%, transparent);
   border-radius: 999px;

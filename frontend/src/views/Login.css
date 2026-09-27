@@ -186,15 +186,6 @@
   opacity: 0.55;
 }
 
-.login-form__error {
-  margin-bottom: var(--space-lg);
-}
-
-.login-form__error :deep(.el-alert__title) {
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
 /* 登录失败 / 网络错误内联提示：el-alert 默认 13px 太小，适老化放大加粗 */
 .login-form__error {
   margin-bottom: var(--space-lg);
@@ -205,7 +196,7 @@
 
 .login-form__error :deep(.el-alert__title) {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
 }
 

@@ -234,7 +234,7 @@
 .ai-panel__title {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
 }
 
@@ -396,7 +396,7 @@
 }
 
 .ai-msg__bubble :deep(.ai-md__strong) {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* 急症语境唯一链接：仅 tel:120，红色加粗，点击热区 ≥40px；气泡在白色表面，用 on-white 红底 */

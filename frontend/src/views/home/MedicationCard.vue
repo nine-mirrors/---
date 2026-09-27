@@ -125,7 +125,7 @@ async function handleUndo() {
 .med-card__title {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -138,7 +138,7 @@ async function handleUndo() {
   min-height: 56px;
   font-family: inherit;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-inverse);
   background-color: var(--color-primary);
   border: none;

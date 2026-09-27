@@ -224,7 +224,7 @@ function handleImageError(event: Event) {
 .drawer-header__title {
   margin: 0;
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.35;
   color: var(--color-text);
 }
@@ -341,7 +341,7 @@ function handleImageError(event: Event) {
 .drawer-section__title {
   margin: 0 0 var(--space-md);
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
   color: var(--color-text);
 }
@@ -366,7 +366,7 @@ function handleImageError(event: Event) {
 .nutr-cell__value {
   margin: 0;
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
   color: var(--color-primary-dark);
 }
@@ -374,7 +374,7 @@ function handleImageError(event: Event) {
 .nutr-cell__unit {
   margin-left: 2px;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .nutr-cell__label {
@@ -449,7 +449,7 @@ function handleImageError(event: Event) {
   height: 1.75em;
   margin-top: 0.1em;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-inverse);
   background-color: var(--color-primary);
   border-radius: 50%;

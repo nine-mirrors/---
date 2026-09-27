@@ -1,5 +1,6 @@
+/* tabbar + 悬浮件安全区由 AppLayout 统一避让，这里只留页面自身的尾部间距 */
 .home-page {
-  padding-bottom: calc(var(--tabbar-height) + var(--space-xl));
+  padding-bottom: var(--space-xl);
 }
 .home-greet {
   margin-bottom: var(--space-lg);
@@ -56,7 +57,7 @@
   height: 64px;
   font-family: inherit;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-inverse);
   background-color: var(--color-primary);
   border: none;
@@ -130,7 +131,7 @@
 .manual__title {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 .manual__sub {
   margin: 0;
@@ -184,7 +185,7 @@
 .recog__loading-text {
   margin: var(--space-sm) 0 var(--space-md);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 .recog__skeleton {
@@ -246,7 +247,7 @@
   margin-top: var(--space-lg);
   font-family: inherit;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-inverse);
   background-color: var(--color-primary);
   border: none;

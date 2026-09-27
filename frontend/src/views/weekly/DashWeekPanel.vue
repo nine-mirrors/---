@@ -276,7 +276,7 @@ const lifestyleTips = computed(() => buildLifestyleTips(props.profile, props.bpR
 .dash-week__title {
   margin: 0;
   font-size: var(--font-size-lg);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -333,7 +333,7 @@ const lifestyleTips = computed(() => buildLifestyleTips(props.profile, props.bpR
 
 .dash-dim__value {
   margin: 0;
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xxl);
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-text);
@@ -342,7 +342,7 @@ const lifestyleTips = computed(() => buildLifestyleTips(props.profile, props.bpR
 .dash-dim__unit {
   margin-left: 2px;
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-text-secondary);
 }
 
@@ -412,14 +412,14 @@ const lifestyleTips = computed(() => buildLifestyleTips(props.profile, props.bpR
   gap: var(--space-xs);
   margin: 0 0 var(--space-xs);
   font-size: var(--font-size-base);
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-text);
 }
 
 .lifestyle-tip__badge {
   padding: 2px 8px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #92400e;
   background-color: color-mix(in srgb, var(--color-warning) 18%, transparent);
   border-radius: 999px;

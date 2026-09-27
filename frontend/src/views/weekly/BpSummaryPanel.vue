@@ -164,7 +164,7 @@ const verdict = computed(() => {
 .bp-summary__title {
   margin: 0;
   font-size: var(--font-size-xl);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -211,7 +211,7 @@ const verdict = computed(() => {
 .bp-stat__unit {
   margin-left: 4px;
   font-size: var(--font-size-base);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-text-secondary);
 }
 
@@ -303,7 +303,7 @@ const verdict = computed(() => {
   padding: 12px 28px;
   font-family: inherit;
   font-size: var(--font-size-lg);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-inverse);
   cursor: pointer;
   background-color: var(--color-primary);

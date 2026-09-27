@@ -296,7 +296,7 @@ const showRenalAdvice = computed(() => draft.renalKRestriction === true)
   gap: var(--space-sm);
   margin: 0 0 var(--space-sm);
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-primary-dark);
 }
 
@@ -316,7 +316,7 @@ const showRenalAdvice = computed(() => draft.renalKRestriction === true)
 }
 
 .info-block__text strong {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 

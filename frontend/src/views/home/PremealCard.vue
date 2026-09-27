@@ -88,7 +88,7 @@ const moodModel = computed({
 .premeal-card__title {
   margin: 0;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -121,7 +121,7 @@ const moodModel = computed({
 
 .premeal-card__hr-input :deep(.el-input__inner) {
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .premeal-card__hr-slider {
@@ -130,7 +130,7 @@ const moodModel = computed({
 
 .premeal-card__hr-unit {
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-primary-dark);
   white-space: nowrap;
 }

@@ -78,8 +78,14 @@ function choose(adoptedHealthy: boolean) {
 </template>
 
 <style scoped>
+/* 该按钮在 el-popover reference 内，吃不到 Result.vue scoped 的 .nd-big-btn，
+   在此补齐同款 56px 适老大按钮规格，避免主 CTA 回落 el-button 默认 32px */
 .save-meal-btn {
   width: 100%;
+  height: 56px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
 }
 
 .save-meal-btn__icon {
@@ -95,7 +101,7 @@ function choose(adoptedHealthy: boolean) {
 .save-pop__title {
   margin: 0;
   font-size: var(--font-size-base);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 

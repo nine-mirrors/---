@@ -23,10 +23,11 @@ const settings = useSettingsStore()
   min-height: 100vh;
 }
 
-/* <1200px：底部 tabbar 占位（与 BottomTab 断点一致） */
+/* <1200px：底部 tabbar + 右下悬浮件（AI 球/语音开关）安全区，
+   避免页面滚到底时通栏 CTA 被悬浮件压住（与 BottomTab 断点一致） */
 @media (max-width: 1199.98px) {
   .app-layout__main {
-    padding-bottom: var(--tabbar-height);
+    padding-bottom: calc(var(--tabbar-height) + var(--float-safe-bottom));
   }
 }
 

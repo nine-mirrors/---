@@ -36,7 +36,7 @@
 }
 
 .msg-bubble :deep(.ai-md__strong) {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* 急症语境下的唯一可点链接：仅 tel:120，红色加粗下划线，点击热区 ≥40px。

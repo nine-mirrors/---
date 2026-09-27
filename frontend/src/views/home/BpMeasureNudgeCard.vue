@@ -126,7 +126,7 @@ async function toggleReadAloud() {
 .bp-nudge__label {
   margin: 0 0 2px;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-warning-strong);
   letter-spacing: 0.02em;
 }
@@ -134,7 +134,7 @@ async function toggleReadAloud() {
 .bp-nudge__line {
   margin: 0;
   font-size: 1.3rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-warning-text);
   line-height: 1.5;
 }
@@ -156,7 +156,7 @@ async function toggleReadAloud() {
   padding: 0 var(--space-md);
   font-family: inherit;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-warning-text);
   background-color: var(--color-bg-card);
   border: 2px solid var(--color-warning);
@@ -178,7 +178,7 @@ async function toggleReadAloud() {
   padding: 0 var(--space-xl);
   font-family: inherit;
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   background-color: var(--color-warning-strong);
   border: none;

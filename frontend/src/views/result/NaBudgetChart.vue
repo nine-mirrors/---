@@ -321,14 +321,14 @@ const { el } = useEcharts(option)
 
 .na-budget-card__percent-num {
   font-size: 2.5rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   color: var(--color-text);
 }
 
 .na-budget-card__percent-unit {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-text);
 }
 
@@ -350,7 +350,7 @@ const { el } = useEcharts(option)
 }
 
 .na-budget-card__salt-line strong {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-primary);
 }
 

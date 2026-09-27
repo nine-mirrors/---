@@ -261,7 +261,7 @@ async function retryCamera() {
   padding: 0 var(--space-xl);
   font-family: inherit;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition:

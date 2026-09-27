@@ -214,7 +214,7 @@ async function handleSave() {
 .manual-form__input :deep(.el-input__inner) {
   height: 52px;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* 右侧步进按钮加大，方便长辈点按 */

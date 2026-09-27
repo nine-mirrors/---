@@ -329,7 +329,7 @@ onBeforeUnmount(() => {
 
 .food-card__name {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 

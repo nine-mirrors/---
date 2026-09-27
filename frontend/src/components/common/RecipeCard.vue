@@ -122,7 +122,7 @@ function handleKeydown(event: KeyboardEvent) {
 .recipe-card__name {
   margin: 0;
   font-size: calc(var(--font-size-base) * 1.15);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
   color: var(--color-text);
 }

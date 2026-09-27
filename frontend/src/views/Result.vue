@@ -292,10 +292,12 @@ onMounted(loadEvaluation)
   min-width: 0;
 }
 
-.result-section-title {
+/* 小节 h2 由 ResultMetrics/RulesPanel/NaBudgetChart/RecommendPanel 等子组件渲染，
+   scoped 直写命中不到，需 :deep() 穿透 */
+:deep(.result-section-title) {
   margin: 0 0 var(--space-lg);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
   color: var(--color-text);
 }
@@ -345,7 +347,7 @@ onMounted(loadEvaluation)
 .summary-card__title {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-secondary);
 }
 
@@ -357,7 +359,8 @@ onMounted(loadEvaluation)
 }
 
 .summary-card__overall.is-green {
-  color: var(--color-success);
+  /* 文字色用 -text 变体（米纸底 6.4:1），装饰色 --color-success 仅 4.1:1 不达标 */
+  color: var(--color-success-text);
 }
 
 .summary-card__overall.is-yellow {
@@ -365,7 +368,7 @@ onMounted(loadEvaluation)
 }
 
 .summary-card__overall.is-red {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 .summary-card__meta {
@@ -391,7 +394,7 @@ onMounted(loadEvaluation)
   gap: var(--space-sm);
   color: var(--color-primary);
   background-color: var(--color-bg-card);
-  border: 1.5px solid var(--color-primary);
+  border: 2px solid var(--color-primary);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition:
@@ -420,7 +423,7 @@ onMounted(loadEvaluation)
 .retake-btn {
   color: var(--color-primary);
   background-color: var(--color-bg-card);
-  border: 1.5px solid var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
 .retake-btn:hover,

@@ -109,7 +109,7 @@ async function restartAssessment() {
 .assessment-card__title {
   margin: 0;
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 

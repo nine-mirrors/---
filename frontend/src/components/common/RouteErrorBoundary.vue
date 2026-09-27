@@ -72,7 +72,7 @@ function reload() {
 .route-error__title {
   margin: 0;
   font-size: 1.3rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -93,7 +93,7 @@ function reload() {
   padding: 0 var(--space-xl);
   font-family: inherit;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-inverse);
   background-color: var(--color-primary);
   border: none;

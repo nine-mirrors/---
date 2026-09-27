@@ -108,7 +108,7 @@ async function resetDemoData() {
 .danger-zone__title {
   margin: 0 0 var(--space-md);
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
