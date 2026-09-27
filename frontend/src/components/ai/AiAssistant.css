@@ -721,13 +721,19 @@
   .ai-fab.is-placed,
   .ai-fab__ball,
   .ai-fab:hover .ai-fab__ball,
-  .ai-fab:active .ai-fab__ball,
+  .ai-fab:active .ai-fab__ball {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Vue <transition> 靠 transitionend 把元素移出 DOM；这里若用 transition:none，
+     事件不触发，引导气泡/面板会永远卡在离场态、持续遮挡点击（reduced-motion 用户
+     反受害最深）。0.01ms 视觉上等同无动画，同时保证 transitionend 正常触发。 */
   .ai-coach-fade-enter-active,
   .ai-coach-fade-leave-active,
   .ai-pop-enter-active,
   .ai-pop-leave-active {
-    transition: none !important;
-    animation: none !important;
-    transform: none !important;
+    transition-duration: 0.01ms !important;
   }
 }

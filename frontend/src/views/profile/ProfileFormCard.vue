@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Close } from '@element-plus/icons-vue'
+import { Bicycle, Close, FirstAidKit, Food, Phone, User } from '@element-plus/icons-vue'
 import { ACTIVITY_OPTIONS, DENTAL_OPTIONS, TASTE_OPTIONS } from '@/constants/dict'
 import {
   COMMON_ALLERGY_TAGS,
@@ -93,6 +93,16 @@ const OPTION_FIELDS: OptionField[] = [
   { key: 'drink', label: '饮酒', options: plainOptions(YESNO) },
 ]
 
+// 分组卡片：③ 活动与生活（职业单独排版）／④ 饮食与口味（控钾、忌口单独排版）
+const LIFE_OPTION_FIELDS = OPTION_FIELDS.filter((item) =>
+  (['activity', 'smoke', 'drink'] as const).includes(item.key as 'activity' | 'smoke' | 'drink'),
+)
+const DIET_OPTION_FIELDS = OPTION_FIELDS.filter((item) =>
+  (['dental', 'taste', 'staplePref', 'eatOutFreq'] as const).includes(
+    item.key as 'dental' | 'taste' | 'staplePref' | 'eatOutFreq',
+  ),
+)
+
 const htnText = computed(() => htnConclusionText(props.profile))
 const phoneText = computed(() => props.phone || '未填写')
 // 确诊高血压时才显示“规律服药”开关
@@ -166,6 +176,32 @@ function toggleCommonTag(name: string) {
   form.value.allergies = list
 }
 
+// 保存浮条：表单分组整体进入视口期间才显示，滚到血压卡等表单外区域自动收起
+const formRootEl = ref<HTMLElement | null>(null)
+const saveBarVisible = ref(false)
+let formObserver: IntersectionObserver | null = null
+
+onMounted(() => {
+  if (!formRootEl.value || typeof IntersectionObserver === 'undefined') {
+    // 不支持观察器时兜底常显，保证保存能力不丢
+    saveBarVisible.value = true
+    return
+  }
+  formObserver = new IntersectionObserver(
+    (entries) => {
+      saveBarVisible.value = entries.some((entry) => entry.isIntersecting)
+    },
+    // 底部留出浮条+tabbar+悬浮件高度，避免表单只剩边缘时按钮乱闪
+    { rootMargin: '0px 0px -220px 0px', threshold: 0 },
+  )
+  formObserver.observe(formRootEl.value)
+})
+
+onBeforeUnmount(() => {
+  formObserver?.disconnect()
+  formObserver = null
+})
+
 function handleSave() {
   // 紧急联系人：姓名与电话要么都不填（未设置），要么都填且电话为 11 位手机号
   const contactName = form.value.emergencyContactName.trim()
@@ -187,36 +223,113 @@ function handleSave() {
 </script>
 
 <template>
-  <section class="nd-card form-card">
-    <h2 class="form-card__title">个人信息</h2>
+  <div ref="formRootEl" class="profile-form">
+    <!-- ① 基本信息 -->
+    <section class="nd-card form-section form-section--basic">
+      <h2 class="form-section__title">
+        <span class="form-section__icon" aria-hidden="true"
+          ><el-icon><User /></el-icon
+        ></span>
+        基本信息
+      </h2>
 
-    <div class="field">
-      <label class="field__label" for="profile-name">昵称</label>
-      <el-input
-        id="profile-name"
-        v-model="form.name"
-        class="field__control"
-        size="large"
-        maxlength="20"
-      />
-    </div>
+      <div class="field">
+        <label class="field__label" for="profile-name">昵称</label>
+        <el-input
+          id="profile-name"
+          v-model="form.name"
+          class="field__control"
+          size="large"
+          maxlength="20"
+        />
+      </div>
 
-    <div class="field">
-      <span class="field__label">手机号</span>
-      <el-input
-        :model-value="phoneText"
-        class="field__control field__control--readonly"
-        size="large"
-        readonly
-      >
-        <template #suffix><span class="field__suffix">登录账号</span></template>
-      </el-input>
-    </div>
+      <div class="field">
+        <span class="field__label">手机号</span>
+        <el-input
+          :model-value="phoneText"
+          class="field__control field__control--readonly"
+          size="large"
+          readonly
+        >
+          <template #suffix><span class="field__suffix">登录账号</span></template>
+        </el-input>
+      </div>
 
-    <!-- 紧急联系人：健康页急症面板里与“拨打 120”并列一键拨打 -->
-    <div class="field">
-      <label class="field__label" for="profile-emergency-name">紧急联系人</label>
-      <span class="field__hint">不舒服时可以一键打给 TA，填子女或常陪您去医院的家人</span>
+      <div class="field">
+        <label class="field__label" for="profile-age">年龄</label>
+        <el-input
+          id="profile-age"
+          :model-value="form.age ?? ''"
+          class="field__control"
+          size="large"
+          type="number"
+          :min="40"
+          :max="100"
+          @update:model-value="(v: string | number) => setNumber('age', v)"
+        >
+          <template #suffix><span class="field__suffix">岁（40–100）</span></template>
+        </el-input>
+      </div>
+
+      <div class="field">
+        <span class="field__label">性别</span>
+        <div class="option-group">
+          <button
+            v-for="option in GENDER_OPTIONS"
+            :key="option.value"
+            type="button"
+            class="option-btn"
+            :class="{ 'is-active': form.gender === option.value }"
+            :aria-pressed="form.gender === option.value"
+            @click="form.gender = option.value"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field__label">身高 / 体重</span>
+        <div class="num-grid">
+          <el-input
+            :model-value="form.heightCm ?? ''"
+            class="field__control"
+            size="large"
+            type="number"
+            :min="50"
+            :max="250"
+            :step="0.1"
+            @update:model-value="(v: string | number) => setNumber('heightCm', v)"
+          >
+            <template #suffix><span class="field__suffix">cm</span></template>
+          </el-input>
+          <el-input
+            :model-value="form.weightKg ?? ''"
+            class="field__control"
+            size="large"
+            type="number"
+            :min="20"
+            :max="250"
+            :step="0.1"
+            @update:model-value="(v: string | number) => setNumber('weightKg', v)"
+          >
+            <template #suffix><span class="field__suffix">kg</span></template>
+          </el-input>
+        </div>
+      </div>
+    </section>
+
+    <!-- ② 紧急联系人：健康页急症面板里与“拨打 120”并列一键拨打，故卡片暖色强调 -->
+    <section class="nd-card form-section form-section--urgent">
+      <h2 class="form-section__title">
+        <span class="form-section__icon form-section__icon--urgent" aria-hidden="true">
+          <el-icon><Phone /></el-icon>
+        </span>
+        紧急联系人
+      </h2>
+      <p class="form-section__sub">不舒服时可以一键打给 TA，填子女或常陪您去医院的家人</p>
+
       <el-input
         id="profile-emergency-name"
         v-model="form.emergencyContactName"
@@ -235,171 +348,153 @@ function handleSave() {
         placeholder="TA 的 11 位手机号"
         @update:model-value="(v: string) => (form.emergencyContactPhone = v.replace(/\D/g, ''))"
       />
-    </div>
+    </section>
 
-    <div class="field">
-      <label class="field__label" for="profile-age">年龄</label>
-      <el-input
-        id="profile-age"
-        :model-value="form.age ?? ''"
-        class="field__control"
-        size="large"
-        type="number"
-        :min="40"
-        :max="100"
-        @update:model-value="(v: string | number) => setNumber('age', v)"
-      >
-        <template #suffix><span class="field__suffix">岁（40–100）</span></template>
-      </el-input>
-    </div>
+    <!-- ③ 活动与生活 -->
+    <section class="nd-card form-section form-section--life">
+      <h2 class="form-section__title">
+        <span class="form-section__icon" aria-hidden="true"
+          ><el-icon><Bicycle /></el-icon
+        ></span>
+        活动与生活
+      </h2>
 
-    <div class="field">
-      <span class="field__label">性别</span>
-      <div class="option-group">
-        <button
-          v-for="option in GENDER_OPTIONS"
-          :key="option.value"
-          type="button"
-          class="option-btn"
-          :class="{ 'is-active': form.gender === option.value }"
-          :aria-pressed="form.gender === option.value"
-          @click="form.gender = option.value"
-        >
-          {{ option.label }}
-        </button>
-      </div>
-    </div>
-
-    <div class="field">
-      <span class="field__label">身高 / 体重</span>
-      <div class="num-grid">
-        <el-input
-          :model-value="form.heightCm ?? ''"
-          class="field__control"
-          size="large"
-          type="number"
-          :min="50"
-          :max="250"
-          :step="0.1"
-          @update:model-value="(v: string | number) => setNumber('heightCm', v)"
-        >
-          <template #suffix><span class="field__suffix">cm</span></template>
-        </el-input>
-        <el-input
-          :model-value="form.weightKg ?? ''"
-          class="field__control"
-          size="large"
-          type="number"
-          :min="20"
-          :max="250"
-          :step="0.1"
-          @update:model-value="(v: string | number) => setNumber('weightKg', v)"
-        >
-          <template #suffix><span class="field__suffix">kg</span></template>
-        </el-input>
-      </div>
-    </div>
-
-    <div class="field">
-      <span class="field__label">职业</span>
-      <div class="option-group option-group--stacked">
-        <button
-          v-for="occupation in OCCUPATIONS"
-          :key="occupation.value"
-          type="button"
-          class="option-btn"
-          :class="{ 'is-active': form.occupation === occupation.value }"
-          :aria-pressed="form.occupation === occupation.value"
-          @click="chooseOccupation(occupation.value)"
-        >
-          {{ occupation.label }}
-        </button>
-      </div>
-    </div>
-
-    <div v-for="item in OPTION_FIELDS" :key="item.key" class="field">
-      <span class="field__label">{{ item.label }}</span>
-      <span v-if="item.hint" class="field__hint">{{ item.hint }}</span>
-      <div class="option-group">
-        <button
-          v-for="option in item.options"
-          :key="option.value"
-          type="button"
-          class="option-btn"
-          :class="{ 'is-active': form[item.key] === option.value }"
-          :aria-pressed="form[item.key] === option.value"
-          @click="form[item.key] = option.value"
-        >
-          {{ option.label }}
-        </button>
-      </div>
-    </div>
-
-    <!-- 控钾三选一（R2.2：肾不好/需控钾，含低钠盐） -->
-    <div class="field">
-      <span class="field__label">肾不好 / 需控钾（含低钠盐）</span>
-      <span class="field__hint">选“有”时，营养建议会去掉补钾类提醒，具体量请遵医嘱</span>
-      <div class="option-group option-group--stacked">
-        <button
-          v-for="option in RENAL_OPTIONS"
-          :key="String(option.value)"
-          type="button"
-          class="option-btn"
-          :class="{ 'is-active': form.renalKRestriction === option.value }"
-          :aria-pressed="form.renalKRestriction === option.value"
-          @click="chooseRenal(option.value)"
-        >
-          <span class="option-btn__label">{{ option.label }}</span>
-          <span class="option-btn__desc">{{ option.description }}</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="field">
-      <span class="field__label">忌口 / 过敏</span>
-      <span class="field__hint">没有可以不填，输入后按回车添加，如：花生、海鲜、辣</span>
-      <div class="tag-editor">
-        <span v-for="(tag, index) in form.allergies" :key="`${tag}-${index}`" class="tag-chip">
-          <span class="tag-chip__text">{{ tag }}</span>
+      <div class="field">
+        <span class="field__label">职业</span>
+        <div class="option-group option-group--stacked">
           <button
+            v-for="occupation in OCCUPATIONS"
+            :key="occupation.value"
             type="button"
-            class="tag-chip__remove"
-            :aria-label="`删除忌口 ${tag}`"
-            @click="removeTag(index)"
+            class="option-btn"
+            :class="{ 'is-active': form.occupation === occupation.value }"
+            :aria-pressed="form.occupation === occupation.value"
+            @click="chooseOccupation(occupation.value)"
           >
-            <el-icon aria-hidden="true"><Close /></el-icon>
+            {{ occupation.label }}
           </button>
-        </span>
-        <input
-          v-model="tagDraft"
-          class="tag-editor__input"
-          type="text"
-          placeholder="添加忌口或过敏原"
-          maxlength="12"
-          @keydown.enter.prevent="addTag"
-          @keydown.delete="removeLastTag"
-          @blur="addTag"
-        />
+        </div>
       </div>
-      <!-- 常见忌口/过敏大字 chips：点一下加上、再点一下取消 -->
-      <p class="tag-quick-label">常见的，点一下就加上（再点一下取消）</p>
-      <div class="tag-quick">
-        <button
-          v-for="name in COMMON_ALLERGY_TAGS"
-          :key="name"
-          type="button"
-          class="tag-quick__chip"
-          :class="{ 'is-active': hasCommonTag(name) }"
-          :aria-pressed="hasCommonTag(name)"
-          @click="toggleCommonTag(name)"
-        >
-          {{ name }}
-        </button>
-      </div>
-    </div>
 
-    <div class="field">
-      <span class="field__label">病史（来自健康测评）</span>
+      <div v-for="item in LIFE_OPTION_FIELDS" :key="item.key" class="field">
+        <span class="field__label">{{ item.label }}</span>
+        <span v-if="item.hint" class="field__hint">{{ item.hint }}</span>
+        <div class="option-group">
+          <button
+            v-for="option in item.options"
+            :key="option.value"
+            type="button"
+            class="option-btn"
+            :class="{ 'is-active': form[item.key] === option.value }"
+            :aria-pressed="form[item.key] === option.value"
+            @click="form[item.key] = option.value"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ 饮食与口味 -->
+    <section class="nd-card form-section form-section--diet">
+      <h2 class="form-section__title">
+        <span class="form-section__icon" aria-hidden="true"
+          ><el-icon><Food /></el-icon
+        ></span>
+        饮食与口味
+      </h2>
+
+      <div v-for="item in DIET_OPTION_FIELDS" :key="item.key" class="field">
+        <span class="field__label">{{ item.label }}</span>
+        <span v-if="item.hint" class="field__hint">{{ item.hint }}</span>
+        <div class="option-group">
+          <button
+            v-for="option in item.options"
+            :key="option.value"
+            type="button"
+            class="option-btn"
+            :class="{ 'is-active': form[item.key] === option.value }"
+            :aria-pressed="form[item.key] === option.value"
+            @click="form[item.key] = option.value"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 控钾三选一（R2.2：肾不好/需控钾，含低钠盐） -->
+      <div class="field">
+        <span class="field__label">肾不好 / 需控钾（含低钠盐）</span>
+        <span class="field__hint">选“有”时，营养建议会去掉补钾类提醒，具体量请遵医嘱</span>
+        <div class="option-group option-group--stacked">
+          <button
+            v-for="option in RENAL_OPTIONS"
+            :key="String(option.value)"
+            type="button"
+            class="option-btn"
+            :class="{ 'is-active': form.renalKRestriction === option.value }"
+            :aria-pressed="form.renalKRestriction === option.value"
+            @click="chooseRenal(option.value)"
+          >
+            <span class="option-btn__label">{{ option.label }}</span>
+            <span class="option-btn__desc">{{ option.description }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field__label">忌口 / 过敏</span>
+        <span class="field__hint">没有可以不填，输入后按回车添加，如：花生、海鲜、辣</span>
+        <div class="tag-editor">
+          <span v-for="(tag, index) in form.allergies" :key="`${tag}-${index}`" class="tag-chip">
+            <span class="tag-chip__text">{{ tag }}</span>
+            <button
+              type="button"
+              class="tag-chip__remove"
+              :aria-label="`删除忌口 ${tag}`"
+              @click="removeTag(index)"
+            >
+              <el-icon aria-hidden="true"><Close /></el-icon>
+            </button>
+          </span>
+          <input
+            v-model="tagDraft"
+            class="tag-editor__input"
+            type="text"
+            placeholder="添加忌口或过敏原"
+            maxlength="12"
+            @keydown.enter.prevent="addTag"
+            @keydown.delete="removeLastTag"
+            @blur="addTag"
+          />
+        </div>
+        <!-- 常见忌口/过敏大字 chips：点一下加上、再点一下取消 -->
+        <p class="tag-quick-label">常见的，点一下就加上（再点一下取消）</p>
+        <div class="tag-quick">
+          <button
+            v-for="name in COMMON_ALLERGY_TAGS"
+            :key="name"
+            type="button"
+            class="tag-quick__chip"
+            :class="{ 'is-active': hasCommonTag(name) }"
+            :aria-pressed="hasCommonTag(name)"
+            @click="toggleCommonTag(name)"
+          >
+            {{ name }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ⑤ 健康状况：病史来自健康测评，仅服药情况可在此切换 -->
+    <section class="nd-card form-section form-section--health">
+      <h2 class="form-section__title">
+        <span class="form-section__icon" aria-hidden="true"
+          ><el-icon><FirstAidKit /></el-icon
+        ></span>
+        健康状况
+      </h2>
+
       <div class="history-box">
         <div class="history-row">
           <span class="history-row__label">血压评估</span>
@@ -419,12 +514,15 @@ function handleSave() {
         </div>
         <p class="history-note">病史信息通过健康测评填写，如需修改请点上方“重新进行健康测评”。</p>
       </div>
-    </div>
+    </section>
 
-    <el-button type="primary" class="form-card__save" size="large" @click="handleSave">
-      保存
-    </el-button>
-  </section>
+    <!-- 保存浮条：表单在视口内时 fixed 贴底，滚出表单区自动隐藏（不占文档流） -->
+    <div class="form-save-bar" :class="{ 'is-visible': saveBarVisible }" aria-hidden="false">
+      <el-button type="primary" class="form-save-bar__btn" size="large" @click="handleSave">
+        保存修改
+      </el-button>
+    </div>
+  </div>
 </template>
 
 <style scoped src="./ProfileFormCard.css"></style>

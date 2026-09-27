@@ -8,7 +8,7 @@
 //     仅最新一次读数分级为 normal 才允许“我已复测正常”关闭。
 //  3) 两个入口都在 120 红钮下并列“紧急联系人”一键拨号（读 profile，未设置则引导去“我的”）
 
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowDown, Phone } from '@element-plus/icons-vue'
 import { nsRead, nsWrite } from '@/utils/storage'
@@ -73,6 +73,88 @@ function dismissNumeric() {
   }
   dismissedKey.value = props.emergencyKey
 }
+
+// —— 展开后自动滚动：折叠条展开/红条出现时，拨号按钮可能落进底部 fixed tabbar，
+//    真机上触点会被 tabbar 截走（“点了没反应”，scrollIntoView 会因元素“仍在视口内”
+//    而拒绝滚动）。改为显式计算底边与 tabbar 安全线的差值，精确补滚。 ——
+const symptomCallsEl = ref<HTMLElement | null>(null)
+const numericEl = ref<HTMLElement | null>(null)
+
+/**
+ * 窄屏底部安全距离：tabbar 高度 + --float-safe-bottom。
+ * 后者覆盖右侧悬浮件纵向区间（语音键顶边最高，超出 tabbar 124px + 12px 呼吸），
+ * 与 AppLayout 主内容区避让口径一致；桌面无 tabbar/悬浮件，返回 0。
+ */
+function bottomSafeOffset(): number {
+  if (window.innerWidth >= 1200) return 0
+  const styles = getComputedStyle(document.documentElement)
+  const tabbar = parseFloat(styles.getPropertyValue('--tabbar-height'))
+  const floatSafe = parseFloat(styles.getPropertyValue('--float-safe-bottom'))
+  return (Number.isFinite(tabbar) ? tabbar : 64) + (Number.isFinite(floatSafe) ? floatSafe : 136)
+}
+
+/** 保证拨号区底边停在 tabbar/悬浮球安全线之上；超出多少补滚多少 */
+function ensureCallsReachable(el: HTMLElement | null) {
+  if (!el) return
+  // 调用方均已 await nextTick（v-if 内容已插入），getBoundingClientRect 会强制同步
+  // reflow，此刻读到的就是展开后的最终位置，直接滚动；300ms 后再补一趟兜字体/图标
+  const adjust = () => {
+    const safe = bottomSafeOffset()
+    if (!safe) return
+    const overflow = el.getBoundingClientRect().bottom - (window.innerHeight - safe)
+    if (overflow > 0) window.scrollBy({ top: overflow + 12, behavior: 'smooth' })
+  }
+  adjust()
+  setTimeout(adjust, 300)
+}
+
+/** 把红条顶部带到视口上部（标题先被看到），随后保证拨号区可点 */
+function presentNumericPanel() {
+  const el = numericEl.value
+  if (!el) return
+  // 调用方已保证 DOM 就绪（watch 的 nextTick / onMounted 延迟），同步定位即可
+  if (window.innerWidth < 1200) {
+    const overflow = el.getBoundingClientRect().top - 16
+    if (overflow > 0) window.scrollBy({ top: overflow, behavior: 'smooth' })
+  }
+  // 红条自身滚定后，拨号区仍可能落在 tabbar 后面；延迟到第一段滚动落定再校正，
+  // 避免两个 smooth scroll 同时发起互相取消
+  setTimeout(() => ensureCallsReachable(el.querySelector('.emergency-panel__calls')), 350)
+}
+
+/**
+ * 急症操作优先于一切引导：通知全局 AI 助手立即关闭“点我就行”新手气泡。
+ * 该气泡 fixed 在右下悬浮球上方，正好会压住紧急联系人拨号按钮。
+ */
+function dismissGlobalCoach() {
+  window.dispatchEvent(new Event('ndh-coach-dismiss'))
+}
+
+watch(symptomOpen, async (open) => {
+  if (!open) return
+  dismissGlobalCoach()
+  await nextTick()
+  ensureCallsReachable(symptomCallsEl.value)
+})
+
+watch(numericBarVisible, async (visible) => {
+  if (!visible) return
+  dismissGlobalCoach()
+  await nextTick()
+  presentNumericPanel()
+})
+
+// 进页面时红条已存在（本周有 ≥180/120）：延迟等血压卡布局稳定后滚到红条，
+// 确保急症警告与拨号按钮不被折叠在首屏外
+onMounted(() => {
+  if (numericBarVisible.value) {
+    // 与滚定位同批延迟：等 App 根级 AiAssistant 的事件监听挂载就绪
+    setTimeout(() => {
+      dismissGlobalCoach()
+      presentNumericPanel()
+    }, 300)
+  }
+})
 </script>
 
 <template>
@@ -96,7 +178,7 @@ function dismissNumeric() {
         <ul class="emergency-panel__symptom-list">
           <li v-for="symptom in RED_FLAG_SYMPTOMS" :key="symptom.id">{{ symptom.label }}</li>
         </ul>
-        <div class="emergency-panel__calls">
+        <div ref="symptomCallsEl" class="emergency-panel__calls">
           <a class="emergency-panel__call" href="tel:120" aria-label="立即拨打 120 急救电话">
             <el-icon :size="26"><Phone /></el-icon>
             <span>立即拨打 120</span>
@@ -131,6 +213,7 @@ function dismissNumeric() {
     <!-- 数值急诊条：本周出现过 ≥180/120（含任一原始读数），复测正常后可关闭 -->
     <div
       v-if="numericBarVisible"
+      ref="numericEl"
       class="emergency-panel__numeric"
       role="alert"
       aria-live="assertive"

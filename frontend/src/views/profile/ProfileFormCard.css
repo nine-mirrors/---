@@ -1,14 +1,60 @@
-.form-card {
+/* 表单分组卡容器：手机单列，桌面在 ≥1200 断点下变双列（见文件底部）。
+   padding-bottom 是给 fixed 保存浮条留的“容器内冗余”：浮条在表单底边进入
+   视口底部 220px 收缩区时才隐藏，窄屏浮条顶边距视口底 290px，临界时最后一张卡
+   底边会短暂落在浮条下方，故容器底内垫 80px 让卡底边始终先越过浮条顶 */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding-bottom: 80px;
+}
+
+.form-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
 }
 
-.form-card__title {
+.form-section__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--color-text);
+}
+
+/* 卡标题图标：与健康评估卡同一套圆底语言 */
+.form-section__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 1.35rem;
+  color: var(--color-primary);
+  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-card));
+  border-radius: 50%;
+}
+
+.form-section__icon--urgent {
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg-on-white);
+}
+
+.form-section__sub {
+  margin: calc(-1 * var(--space-sm)) 0 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* 紧急联系人卡：暖色描边+浅暖底，提示“急症时一键拨打”的重要性，但不使用告警红 */
+.form-section--urgent {
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, var(--color-border));
+  background-color: var(--color-danger-bg);
 }
 
 .field {
@@ -282,12 +328,54 @@
   color: var(--color-text-secondary);
 }
 
-.form-card__save {
+/* 保存浮条：表单在视口内期间 fixed 贴在底部安全区（窄屏抬到 tabbar+悬浮件之上），
+   不占文档流；IntersectionObserver 控制 is-visible，滚出表单区自动隐藏 */
+.form-save-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--tabbar-height) + var(--float-safe-bottom) + 8px);
+  z-index: 100;
+  padding: 12px;
+  background-color: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-base);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0s linear 0.2s;
+}
+
+.form-save-bar.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.form-save-bar__btn {
   width: 100%;
   min-height: 56px;
   font-size: 1.1rem;
   font-weight: 600;
   border-radius: var(--radius-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-save-bar,
+  .form-save-bar.is-visible {
+    transform: none;
+    transition: opacity 0.01ms linear;
+  }
 }
 
 @media (max-width: 768px) {
@@ -300,10 +388,44 @@
   }
 }
 
-/* 桌面宽屏：表单控件限制在易读易点的宽度内，不再横跨整个内容区（最宽约 1000px）。
-   只收窄表单卡本身，评估/血压记录等表格类卡片仍占满整行 */
+/* 桌面宽屏：5 张分组卡双列排布，填满与上方评估卡齐平的内容宽度，
+   消除旧版 720px 卡贴左、右侧大片留白的问题，并把整页长度压缩近一半。
+   DOM 顺序 ①②③④⑤：①③ 落左列、②④⑤ 落右列，两列高低大致均衡。
+   浮条为 fixed 不占网格，无需指定列位。 */
 @media (min-width: 1200px) {
-  .form-card {
-    max-width: 720px;
+  .profile-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .form-section--basic,
+  .form-section--life {
+    grid-column: 1;
+  }
+
+  .form-section--urgent,
+  .form-section--diet,
+  .form-section--health {
+    grid-column: 2;
+  }
+
+  /* 桌面无 tabbar/悬浮件在内容区左侧：浮条随侧栏宽度定位、右侧避让 AI 悬浮球，
+     保存按钮靠右收窄 */
+  .form-save-bar {
+    right: 112px;
+    bottom: 24px;
+    left: calc(var(--sider-width) + 24px);
+  }
+
+  .form-save-bar__btn {
+    width: min(320px, 50%);
+    margin-left: auto;
+  }
+
+  /* 侧栏折叠时浮条左缘跟随收窄后的侧栏（关在桌面断点内，窄屏侧栏隐藏不生效） */
+  :global(.app-layout--sider-collapsed) .form-save-bar {
+    left: calc(var(--sider-width-collapsed) + 24px);
   }
 }

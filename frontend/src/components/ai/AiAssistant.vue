@@ -422,8 +422,18 @@ function onDocumentKeydown(event: KeyboardEvent): void {
   }
 }
 
+/**
+ * 急症面板（健康页 120/紧急联系人拨号区）展开时发来事件：
+ * 拨号是紧急操作，引导气泡必须立即让位，不能挡住按钮。
+ * dismissCoach 同时标记已读，之后不再弹出。
+ */
+function onEmergencyCoachDismiss(): void {
+  dismissCoach()
+}
+
 onMounted(() => {
   document.addEventListener('keydown', onDocumentKeydown)
+  window.addEventListener('ndh-coach-dismiss', onEmergencyCoachDismiss)
   // 首次访问（全局键不存在）：只在悬浮球旁显示 8 秒小气泡引导，不再自动展开大面板
   if (!hidden.value && !hasSeenBubble()) {
     showCoach.value = true
@@ -439,6 +449,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onDocumentKeydown)
+  window.removeEventListener('ndh-coach-dismiss', onEmergencyCoachDismiss)
   window.removeEventListener('resize', handleWindowResize)
   clearCoachTimer()
   stopMic()
