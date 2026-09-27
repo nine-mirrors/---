@@ -57,13 +57,9 @@ const liveProtein = computed(() => {
 })
 const liveBmiHint = computed(() => bmiHintText(liveBmi.value))
 const welcomeName = computed(() => auth.user?.name || '朋友')
-const userPhone = computed(() => auth.user?.phone)
-// 手机号脱敏展示：138****0006，让长辈确认当前登录的是哪个账号
-const maskedPhone = computed(() => {
-  const phone = auth.user?.phone
-  if (!phone || phone.length !== 11) return phone ?? ''
-  return `${phone.slice(0, 3)}****${phone.slice(-4)}`
-})
+const userEmail = computed(() => auth.user?.email)
+// 完整展示登录邮箱，让长辈确认当前登录的是哪个账号（邮箱无需手机号式脱敏）
+const accountEmail = computed(() => auth.user?.email ?? '')
 
 async function handleSave() {
   try {
@@ -85,7 +81,7 @@ async function handleSave() {
     <header class="profile-header">
       <h1 class="profile-header__title">我的</h1>
       <p class="profile-header__welcome">你好，{{ welcomeName }}</p>
-      <p v-if="maskedPhone" class="profile-header__account">当前账号 {{ maskedPhone }}</p>
+      <p v-if="accountEmail" class="profile-header__account">当前账号 {{ accountEmail }}</p>
     </header>
 
     <AssessmentSummaryCard :profile="profileStore.profile" />
@@ -110,7 +106,7 @@ async function handleSave() {
 
     <ProfileFormCard
       v-model="form"
-      :phone="userPhone"
+      :email="userEmail"
       :profile="profileStore.profile"
       @save="handleSave"
     />

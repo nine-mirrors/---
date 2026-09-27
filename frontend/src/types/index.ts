@@ -207,7 +207,6 @@ export interface HtnDetail {
  */
 export interface Profile {
   name: string
-  phone: string
   age: number | null
   gender: string
   heightCm: number | null

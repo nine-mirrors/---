@@ -9,6 +9,27 @@
   padding-bottom: 80px;
 }
 
+/* 手机端：两个列容器不生成盒子，五张卡直接按下方 order 排成 ①②③④⑤ 单列 */
+.profile-form__col {
+  display: contents;
+}
+
+.form-section--basic {
+  order: 1;
+}
+.form-section--urgent {
+  order: 2;
+}
+.form-section--life {
+  order: 3;
+}
+.form-section--diet {
+  order: 4;
+}
+.form-section--health {
+  order: 5;
+}
+
 .form-section {
   display: flex;
   flex-direction: column;
@@ -388,27 +409,32 @@
   }
 }
 
-/* 桌面宽屏：5 张分组卡双列排布，填满与上方评估卡齐平的内容宽度，
-   消除旧版 720px 卡贴左、右侧大片留白的问题，并把整页长度压缩近一半。
-   DOM 顺序 ①②③④⑤：①③ 落左列、②④⑤ 落右列，两列高低大致均衡。
-   浮条为 fixed 不占网格，无需指定列位。 */
+/* 桌面宽屏：两列容器恢复成盒，卡片在各自列内自然流式堆叠。
+   不用 grid 固定行：行轨道会把短卡（如仅两个字段的紧急联系人）下方锁出大片空白；
+   flex 列内卡片首尾相接，只在较矮列的列底留白，消除红框式空洞。
+   左列 ①③（基本信息+活动生活），右列 ②④⑤（紧急联系人+饮食+健康），两列总高接近。
+   浮条为 fixed 不参与排布。 */
 @media (min-width: 1200px) {
   .profile-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .profile-form__col {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
     gap: 24px;
-    align-items: start;
+    min-width: 0;
   }
 
+  /* 桌面列内顺序即 DOM 顺序，手机端用的 order 复位，避免影响后续扩展 */
   .form-section--basic,
-  .form-section--life {
-    grid-column: 1;
-  }
-
   .form-section--urgent,
+  .form-section--life,
   .form-section--diet,
   .form-section--health {
-    grid-column: 2;
+    order: initial;
   }
 
   /* 桌面无 tabbar/悬浮件在内容区左侧：浮条随侧栏宽度定位、右侧避让 AI 悬浮球，

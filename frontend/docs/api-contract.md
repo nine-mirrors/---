@@ -21,7 +21,7 @@
 ### 0.2 鉴权
 
 - 注册/登录/验证码登录成功后，后端返回 JWT（见 §0.6 决议 4），前端存入全局键 `ndh_auth_v1`。
-- 除 `register`、`login`、`sms/send`、`login/sms` 外，其余端点需 `Authorization: Bearer <token>`。
+- 除 `register`、`login`、`email/send`、`login/email` 外，其余端点需 `Authorization: Bearer <token>`。
 - 401 响应：前端清会话、跳 `/login`、提示"登录已过期，请重新登录"。
 
 ### 0.3 数据包装与统一错误结构
@@ -30,7 +30,7 @@
 - 非 2xx 返回错误体：
 
 ```json
-{ "code": "PHONE_ALREADY_REGISTERED", "message": "该手机号已注册，请直接登录" }
+{ "code": "EMAIL_ALREADY_REGISTERED", "message": "该邮箱已注册，请直接登录" }
 ```
 
 - `code`：业务错误码字符串；后端不返回时前端回落为 HTTP 状态数字码，网络错误为 `NETWORK_ERROR`。
@@ -62,7 +62,7 @@
 | 5   | 多用户隔离                   | **SQLite 关系表 + `uid` 外键，所有查询强制 `WHERE uid = 当前用户`**                            | JSON 按 uid 命名空间是前端 mock 在 localStorage 里的模拟手段，不要照搬到服务端：无法查询、无法保证完整性。建议用 SQLAlchemy，外键 `uid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE`，打开 FK 约束   |
 | 6   | 血压/服药/餐次存哪           | **全部 SQLite 表**（`bp_logs`、`medication_records`、`meals`、`profiles`、`device_*`）        | JSON 文件只用于**只读静态种子**（食材库、食谱库）。用户产生的数据一律入库，支持 `?from=&to=` 范围查询、倒序、按 id 删除                                                                                    |
 
-**建议首批建表**：`users`（id/phone/name/password_hash/salt/created_at）、`profiles`（uid 一对一，23 字段见 S02 §4）、`meals` + `meal_items`、`bp_logs`、`medication_records`、`device_days`（或 `device_metrics` 长表）。`id` 由服务端生成（如 `bp_`/`med_` 前缀 + uuidhex），餐次表对客户端上送的 `id` 建唯一索引做幂等。
+**建议首批建表**：`users`（id/email/name/password_hash/salt/created_at，email 入库前 `strip().lowercase()` 并加唯一索引）、`profiles`（uid 一对一，23 字段见 S02 §4）、`meals` + `meal_items`、`bp_logs`、`medication_records`、`device_days`（或 `device_metrics` 长表）。`id` 由服务端生成（如 `bp_`/`med_` 前缀 + uuidhex），餐次表对客户端上送的 `id` 建唯一索引做幂等。
 
 ---
 
@@ -72,8 +72,8 @@
 | ---- | --------------------- | ---------------------------- |
 | POST | `/api/auth/register`  | 注册                         |
 | POST | `/api/auth/login`     | 密码登录                     |
-| POST | `/api/auth/sms/send`  | 发送验证码                   |
-| POST | `/api/auth/login/sms` | 验证码登录（未注册自动建号） |
+| POST | `/api/auth/email/send`  | 发送邮箱验证码               |
+| POST | `/api/auth/login/email` | 邮箱验证码登录（未注册自动建号） |
 | POST | `/api/auth/logout`    | 退出登录                     |
 | GET  | `/api/auth/me`        | 当前用户                     |
 
@@ -155,7 +155,6 @@
 ```json
 {
   "name": "王阿姨",
-  "phone": "13800000001",
   "age": 68,
   "gender": "女",
   "heightCm": 160,

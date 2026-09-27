@@ -1,8 +1,8 @@
 /**
  * Auth Store（Task 12a 重写）
  *
- * 钉死导出：session、user、ready、login/register/loginBySms/sendSmsCode/demoLogin/logout/restore
- * - 会话持久化到全局键 ndh_auth_v1（含 uid/phone/name/token/loginAt）；
+ * 钉死导出：session、user、ready、login/register/loginByEmail/sendEmailCode/demoLogin/logout/restore
+ * - 会话持久化到全局键 ndh_auth_v1（含 uid/email/name/token/loginAt）；
  * - restore() 从 localStorage 恢复会话并设 ready=true；
  * - logout 清会话跳登录（不清业务数据）；
  * - 演示账号 uid=DEMO_UID，只写会话不建账号行。
@@ -13,7 +13,7 @@ import { computed, ref } from 'vue'
 import { AUTH_SESSION_KEY, DEMO_UID, genMockToken } from '@/utils/account'
 import { readGlobal, removeGlobal, writeGlobal } from '@/utils/storage'
 import * as authApi from '@/api/auth'
-import type { AuthRequest, Session, SmsLoginRequest, SmsSendRequest } from '@/types/auth'
+import type { AuthRequest, EmailLoginRequest, EmailSendRequest, Session } from '@/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const session = ref<Session | null>(null)
@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
   /** 当前登录用户（从会话派生） */
   const user = computed(() => {
     if (!session.value) return null
-    return { uid: session.value.uid, phone: session.value.phone, name: session.value.name }
+    return { uid: session.value.uid, email: session.value.email, name: session.value.name }
   })
 
   /** 持久化会话到全局键 */
@@ -37,7 +37,8 @@ export const useAuthStore = defineStore('auth', () => {
   /** 从 localStorage 恢复会话（应用启动时调用） */
   function restore(): void {
     const saved = readGlobal<Session>(AUTH_SESSION_KEY)
-    if (saved && saved.uid && saved.token) {
+    // email 为必需字段：早期手机号版本的旧会话无 email，视为失效需重新登录
+    if (saved && saved.uid && saved.token && saved.email) {
       session.value = saved
     } else {
       session.value = null
@@ -48,11 +49,11 @@ export const useAuthStore = defineStore('auth', () => {
   /** 写入会话并持久化 */
   function setSession(data: {
     token: string
-    user: { uid: string; phone: string; name: string }
+    user: { uid: string; email: string; name: string }
   }): void {
     session.value = {
       uid: data.user.uid,
-      phone: data.user.phone,
+      email: data.user.email,
       name: data.user.name,
       token: data.token,
       loginAt: new Date().toISOString(),
@@ -72,14 +73,14 @@ export const useAuthStore = defineStore('auth', () => {
     setSession(res)
   }
 
-  /** 发送验证码 */
-  async function sendSmsCode(req: SmsSendRequest): Promise<void> {
-    await authApi.sendSmsCode(req)
+  /** 发送邮箱验证码 */
+  async function sendEmailCode(req: EmailSendRequest): Promise<void> {
+    await authApi.sendEmailCode(req)
   }
 
-  /** 验证码登录（未注册自动建号） */
-  async function loginBySms(req: SmsLoginRequest): Promise<void> {
-    const res = await authApi.loginBySms(req)
+  /** 邮箱验证码登录（未注册自动建号） */
+  async function loginByEmail(req: EmailLoginRequest): Promise<void> {
+    const res = await authApi.loginByEmail(req)
     setSession(res)
   }
 
@@ -87,7 +88,7 @@ export const useAuthStore = defineStore('auth', () => {
   function demoLogin(): void {
     session.value = {
       uid: DEMO_UID,
-      phone: '13800000000',
+      email: 'wangayi@example.com',
       name: '王阿姨',
       token: genMockToken(),
       loginAt: new Date().toISOString(),
@@ -129,8 +130,8 @@ export const useAuthStore = defineStore('auth', () => {
     ready,
     login,
     register,
-    loginBySms,
-    sendSmsCode,
+    loginByEmail,
+    sendEmailCode,
     demoLogin,
     logout,
     clearSessionLocal,

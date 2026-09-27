@@ -1,21 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import {
   DEMO_UID,
-  MOCK_SMS_CODE,
+  MOCK_EMAIL_CODE,
   hashPassword,
   verifyPassword,
   namespacedKey,
   genMockToken,
   isPhone,
+  isEmail,
   isPassword,
-  isSmsCode,
+  isEmailCode,
   genSalt,
 } from '@/utils/account'
 
 describe('account utils', () => {
-  it('常量正确：DEMO_UID=demo，MOCK_SMS_CODE=123456', () => {
+  it('常量正确：DEMO_UID=demo，MOCK_EMAIL_CODE=123456', () => {
     expect(DEMO_UID).toBe('demo')
-    expect(MOCK_SMS_CODE).toBe('123456')
+    expect(MOCK_EMAIL_CODE).toBe('123456')
   })
 
   it('hashPassword：同密码同 salt 产出一致散列', async () => {
@@ -62,12 +63,23 @@ describe('account utils', () => {
     expect(t1).not.toBe(t2)
   })
 
-  it('isPhone：11 位 1 开头为合法', () => {
+  it('isPhone：11 位 1 开头为合法（紧急联系人用，账号已改邮箱，此函数保留）', () => {
     expect(isPhone('13800000000')).toBe(true)
     expect(isPhone('1380000000')).toBe(false) // 10 位
     expect(isPhone('23800000000')).toBe(false) // 非 1 开头
     expect(isPhone('1380000000a')).toBe(false) // 含字母
     expect(isPhone('')).toBe(false)
+  })
+
+  it('isEmail：常规邮箱为合法，缺@/缺域名点/带空格拒绝', () => {
+    expect(isEmail('wangayi@163.com')).toBe(true)
+    expect(isEmail('a.b+c@sub.example.cn')).toBe(true)
+    expect(isEmail('  WangAyi@QQ.COM  ')).toBe(true) // 允许首尾空格，调用方 trim
+    expect(isEmail('no-at-sign.com')).toBe(false)
+    expect(isEmail('a@')).toBe(false)
+    expect(isEmail('a@b')).toBe(false) // 无顶级域点
+    expect(isEmail('a b@c.com')).toBe(false) // 含空格
+    expect(isEmail('')).toBe(false)
   })
 
   it('isPassword：≥6 位为合法', () => {
@@ -76,10 +88,10 @@ describe('account utils', () => {
     expect(isPassword('')).toBe(false)
   })
 
-  it('isSmsCode：6 位数字为合法', () => {
-    expect(isSmsCode('123456')).toBe(true)
-    expect(isSmsCode('12345')).toBe(false)
-    expect(isSmsCode('1234567')).toBe(false)
-    expect(isSmsCode('12345a')).toBe(false)
+  it('isEmailCode：6 位数字为合法', () => {
+    expect(isEmailCode('123456')).toBe(true)
+    expect(isEmailCode('12345')).toBe(false)
+    expect(isEmailCode('1234567')).toBe(false)
+    expect(isEmailCode('12345a')).toBe(false)
   })
 })

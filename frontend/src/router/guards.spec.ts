@@ -16,7 +16,7 @@ vi.mock('@/views/ai/AiChatPage.vue', () => ({ default: { template: '<div />' } }
 
 const SESSION = {
   uid: 'u-g',
-  phone: '13800000000',
+  email: 'zhaonainai@example.com',
   name: '赵奶奶',
   token: 't',
   loginAt: '2025-01-01',

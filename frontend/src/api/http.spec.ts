@@ -34,7 +34,7 @@ describe('http 401 拦截（二轮 P1：单飞 + 不递归 + 硬刷新）', () =
     setActivePinia(createPinia())
     window.localStorage.setItem(
       AUTH_SESSION_KEY,
-      JSON.stringify({ uid: 'u1', phone: '1', name: 'n', token: 't', loginAt: 'x' }),
+      JSON.stringify({ uid: 'u1', email: 'u1@example.com', name: 'n', token: 't', loginAt: 'x' }),
     )
     assignMock = vi.fn()
     // jsdom 下替换 location（本文件用例独立环境，无需恢复真实跳转）
@@ -88,7 +88,7 @@ describe('http 401 拦截（二轮 P1：单飞 + 不递归 + 硬刷新）', () =
     const removeSpy = vi.spyOn(Storage.prototype, 'removeItem')
 
     await expect(
-      http.post('/api/auth/login', { phone: '1', password: 'x' }),
+      http.post('/api/auth/login', { email: 'u1@example.com', password: 'x' }),
     ).rejects.toBeInstanceOf(ApiError)
     await Promise.resolve()
     await Promise.resolve()

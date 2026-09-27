@@ -14,7 +14,6 @@ import type { Profile } from '@/types'
 function createDefaultProfile(): Profile {
   return {
     name: '',
-    phone: '',
     age: null,
     gender: '',
     heightCm: null,
@@ -134,12 +133,6 @@ export const useProfileStore = defineStore('profile', () => {
     return profile.value
   }
 
-  async function syncPhone(phone: string): Promise<Profile> {
-    profile.value.phone = phone || ''
-    await persist()
-    return profile.value
-  }
-
   return {
     profile,
     bmi,
@@ -149,6 +142,5 @@ export const useProfileStore = defineStore('profile', () => {
     updateProfile,
     completeOnboarding,
     restartAssessment,
-    syncPhone,
   }
 })

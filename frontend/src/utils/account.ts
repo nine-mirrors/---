@@ -9,8 +9,8 @@
 /** 一键体验固定演示 uid（与任何注册账号物理隔离） */
 export const DEMO_UID = 'demo'
 
-/** mock 验证码固定码（FR-50） */
-export const MOCK_SMS_CODE = '123456'
+/** mock 邮箱验证码固定码（FR-50）；真实模式由后端发邮件 */
+export const MOCK_EMAIL_CODE = '123456'
 
 /** 会话全局键（含 token） */
 export const AUTH_SESSION_KEY = 'ndh_auth_v1'
@@ -95,9 +95,20 @@ export function genMockToken(): string {
     .join('')
 }
 
-/** 手机号格式：1 开头 11 位数字 */
+/** 手机号格式：1 开头 11 位数字（用于紧急联系人等非账号场景） */
 export function isPhone(phone: string): boolean {
   return /^1\d{10}$/.test(phone)
+}
+
+/**
+ * 邮箱格式：名称@域名.顶级域（顶级域至少 2 个字符），总长 ≤128。
+ * 刻意保持宽松：不与各服务商的奇葩规则较劲，只拦明显错误。
+ */
+export function isEmail(email: string): boolean {
+  if (typeof email !== 'string') return false
+  const value = email.trim()
+  if (value.length === 0 || value.length > 128) return false
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)
 }
 
 /** 密码格式：≥6 位 */
@@ -105,7 +116,7 @@ export function isPassword(password: string): boolean {
   return typeof password === 'string' && password.length >= 6
 }
 
-/** 验证码格式：6 位数字 */
-export function isSmsCode(code: string): boolean {
+/** 验证码格式：6 位数字（邮箱验证码同样为 6 位数字） */
+export function isEmailCode(code: string): boolean {
   return /^\d{6}$/.test(code)
 }

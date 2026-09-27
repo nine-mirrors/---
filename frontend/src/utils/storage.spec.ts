@@ -5,7 +5,7 @@ import { AUTH_SESSION_KEY } from './account'
 
 const SESSION = {
   uid: 'u-test',
-  phone: '13800000000',
+  email: 'ceshi@example.com',
   name: '测试',
   token: 't',
   loginAt: '2025-01-01',

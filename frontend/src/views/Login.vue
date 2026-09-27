@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, reactive, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Food, Iphone, Lock, Message, User } from '@element-plus/icons-vue'
+import { Food, Lock, Message, User } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { isApiError } from '@/api/http'
-import { MOCK_SMS_CODE } from '@/utils/account'
+import { MOCK_EMAIL_CODE } from '@/utils/account'
 
-type TabKey = 'sms' | 'password'
+type TabKey = 'code' | 'password'
 type PasswordMode = 'login' | 'register'
 
 const router = useRouter()
@@ -15,23 +15,23 @@ const auth = useAuthStore()
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
 
-const activeTab = ref<TabKey>('sms')
+const activeTab = ref<TabKey>('code')
 const passwordMode = ref<PasswordMode>('login')
 
-// 验证码登录
-const smsForm = reactive({
-  phone: '',
+// 邮箱验证码登录
+const codeForm = reactive({
+  email: '',
   code: '',
 })
-const smsError = ref('')
-const smsLoading = ref(false)
+const codeError = ref('')
+const codeLoginLoading = ref(false)
 const codeSending = ref(false)
 const countdown = ref(0)
 let countdownTimer: ReturnType<typeof setInterval> | null = null
 
 // 密码登录/注册
 const pwdForm = reactive({
-  phone: '',
+  email: '',
   password: '',
   name: '',
 })
@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
 })
 
 function clearAllErrors() {
-  smsError.value = ''
+  codeError.value = ''
   pwdError.value = ''
 }
 
@@ -76,10 +76,12 @@ function goRegister() {
   clearAllErrors()
 }
 
-// 验证码：格式校验（手机号 / 6 位数字）
-function validatePhone(phone: string): string | null {
-  if (!phone.trim()) return '请输入手机号'
-  if (!/^1\d{10}$/.test(phone.trim())) return '请输入 11 位手机号'
+// 格式校验（邮箱 / 6 位数字验证码）
+function validateEmail(email: string): string | null {
+  const value = email.trim()
+  if (!value) return '请输入邮箱地址'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) || value.length > 128)
+    return '邮箱格式不对，如 wangayi@163.com'
   return null
 }
 
@@ -129,65 +131,65 @@ function startCountdown() {
   }, 1000)
 }
 
-// 发送验证码
+// 发送邮箱验证码
 async function handleSendCode() {
   if (codeSending.value || countdown.value > 0) return
-  const phoneErr = validatePhone(smsForm.phone)
-  if (phoneErr) {
-    smsError.value = phoneErr
+  const emailErr = validateEmail(codeForm.email)
+  if (emailErr) {
+    codeError.value = emailErr
     return
   }
-  smsError.value = ''
+  codeError.value = ''
   codeSending.value = true
   try {
-    await auth.sendSmsCode({ phone: smsForm.phone.trim() })
+    await auth.sendEmailCode({ email: codeForm.email.trim() })
     startCountdown()
     // mock 模式自动填入演示码并明示
     if (USE_MOCK) {
-      smsForm.code = MOCK_SMS_CODE
-      smsError.value = ''
+      codeForm.code = MOCK_EMAIL_CODE
+      codeError.value = ''
     }
   } catch (err) {
-    smsError.value = extractError(err, '验证码发送失败，请稍后再试')
+    codeError.value = extractError(err, '验证码发送失败，请稍后再试')
   } finally {
     codeSending.value = false
   }
 }
 
-// 验证码登录
-async function handleSmsLogin() {
-  if (smsLoading.value) return
-  const phoneErr = validatePhone(smsForm.phone)
-  if (phoneErr) {
-    smsError.value = phoneErr
+// 邮箱验证码登录
+async function handleCodeLogin() {
+  if (codeLoginLoading.value) return
+  const emailErr = validateEmail(codeForm.email)
+  if (emailErr) {
+    codeError.value = emailErr
     return
   }
-  const codeErr = validateCode(smsForm.code)
+  const codeErr = validateCode(codeForm.code)
   if (codeErr) {
-    smsError.value = codeErr
+    codeError.value = codeErr
     return
   }
-  smsError.value = ''
-  smsLoading.value = true
+  codeError.value = ''
+  codeLoginLoading.value = true
   try {
-    await auth.loginBySms({
-      phone: smsForm.phone.trim(),
-      code: smsForm.code.trim(),
+    await auth.loginByEmail({
+      email: codeForm.email.trim(),
+      code: codeForm.code.trim(),
     })
     hardRedirectAfterLogin()
   } catch (err) {
-    smsError.value = extractError(err, '登录失败，请稍后再试')
+    codeError.value = extractError(err, '登录失败，请稍后再试')
   } finally {
-    smsLoading.value = false
+    codeLoginLoading.value = false
   }
 }
 
 // 密码登录
 async function handlePasswordLogin() {
   if (pwdLoading.value) return
-  const phoneErr = validatePhone(pwdForm.phone)
-  if (phoneErr) {
-    pwdError.value = phoneErr
+  const emailErr = validateEmail(pwdForm.email)
+  if (emailErr) {
+    pwdError.value = emailErr
     return
   }
   const pwdErr = validatePassword(pwdForm.password)
@@ -199,7 +201,7 @@ async function handlePasswordLogin() {
   pwdLoading.value = true
   try {
     await auth.login({
-      phone: pwdForm.phone.trim(),
+      email: pwdForm.email.trim(),
       password: pwdForm.password,
     })
     hardRedirectAfterLogin()
@@ -213,9 +215,9 @@ async function handlePasswordLogin() {
 // 注册
 async function handleRegister() {
   if (pwdLoading.value) return
-  const phoneErr = validatePhone(pwdForm.phone)
-  if (phoneErr) {
-    pwdError.value = phoneErr
+  const emailErr = validateEmail(pwdForm.email)
+  if (emailErr) {
+    pwdError.value = emailErr
     return
   }
   const pwdErr = validatePassword(pwdForm.password)
@@ -227,7 +229,7 @@ async function handleRegister() {
   pwdLoading.value = true
   try {
     await auth.register({
-      phone: pwdForm.phone.trim(),
+      email: pwdForm.email.trim(),
       password: pwdForm.password,
       name: pwdForm.name.trim() || undefined,
     })
@@ -257,12 +259,12 @@ const countdownLabel = computed(() => {
 })
 
 const sendCodeDisabled = computed(
-  () => codeSending.value || countdown.value > 0 || smsLoading.value,
+  () => codeSending.value || countdown.value > 0 || codeLoginLoading.value,
 )
 
 // 验证码自动分段显示：123 456
 const codeDisplay = computed(() => {
-  const digits = smsForm.code.replace(/\D/g, '').slice(0, 6)
+  const digits = codeForm.code.replace(/\D/g, '').slice(0, 6)
   if (digits.length <= 3) return digits
   return `${digits.slice(0, 3)} ${digits.slice(3)}`
 })
@@ -271,7 +273,7 @@ function onCodeInput(value: string | Event) {
   // Element Plus el-input 的 input 事件传出字符串值；原生 input 事件传出 Event
   const raw = typeof value === 'string' ? value : ((value.target as HTMLInputElement)?.value ?? '')
   const digits = raw.replace(/\D/g, '').slice(0, 6)
-  smsForm.code = digits
+  codeForm.code = digits
 }
 </script>
 
@@ -291,10 +293,10 @@ function onCodeInput(value: string | Event) {
         <button
           type="button"
           class="tab"
-          :class="{ 'is-active': activeTab === 'sms' }"
+          :class="{ 'is-active': activeTab === 'code' }"
           role="tab"
-          :aria-selected="activeTab === 'sms'"
-          @click="switchTab('sms')"
+          :aria-selected="activeTab === 'code'"
+          @click="switchTab('code')"
         >
           验证码登录
         </button>
@@ -310,11 +312,11 @@ function onCodeInput(value: string | Event) {
         </button>
       </div>
 
-      <!-- 验证码登录 -->
-      <form v-if="activeTab === 'sms'" class="login-form" @submit.prevent="handleSmsLogin">
+      <!-- 邮箱验证码登录 -->
+      <form v-if="activeTab === 'code'" class="login-form" @submit.prevent="handleCodeLogin">
         <el-alert
-          v-if="smsError"
-          :title="smsError"
+          v-if="codeError"
+          :title="codeError"
           type="error"
           show-icon
           :closable="false"
@@ -322,27 +324,27 @@ function onCodeInput(value: string | Event) {
         />
 
         <div class="field">
-          <label class="field__label" for="sms-phone">手机号</label>
+          <label class="field__label" for="login-email">邮箱</label>
           <el-input
-            id="sms-phone"
-            v-model="smsForm.phone"
+            id="login-email"
+            v-model="codeForm.email"
             size="large"
-            placeholder="请输入手机号"
-            maxlength="11"
-            inputmode="numeric"
-            autocomplete="tel"
+            placeholder="请输入邮箱地址"
+            maxlength="128"
+            inputmode="email"
+            autocomplete="email"
           >
             <template #prefix>
-              <el-icon :size="22"><Iphone /></el-icon>
+              <el-icon :size="22"><Message /></el-icon>
             </template>
           </el-input>
         </div>
 
         <div class="field">
-          <label class="field__label" for="sms-code">验证码</label>
+          <label class="field__label" for="login-code">验证码</label>
           <div class="code-row">
             <el-input
-              id="sms-code"
+              id="login-code"
               :model-value="codeDisplay"
               size="large"
               placeholder="6 位数字"
@@ -366,8 +368,9 @@ function onCodeInput(value: string | Event) {
             </button>
           </div>
           <p v-if="USE_MOCK" class="login-form__hint login-form__hint--mock">
-            演示模式，验证码 {{ MOCK_SMS_CODE }}，已自动填入
+            演示模式，验证码 {{ MOCK_EMAIL_CODE }}，已自动填入
           </p>
+          <p v-else class="login-form__hint">验证码通过邮件发送，若没收到请看一眼垃圾邮件</p>
         </div>
 
         <el-button
@@ -375,14 +378,14 @@ function onCodeInput(value: string | Event) {
           type="primary"
           size="large"
           class="btn-login"
-          :loading="smsLoading"
+          :loading="codeLoginLoading"
         >
           登录
         </el-button>
 
         <div class="switch-row">
           <button type="button" class="switch-link" @click="goRegister">
-            没有账号？用手机号注册
+            没有账号？用邮箱注册
           </button>
         </div>
       </form>
@@ -403,18 +406,18 @@ function onCodeInput(value: string | Event) {
         />
 
         <div class="field">
-          <label class="field__label" for="pwd-phone">手机号</label>
+          <label class="field__label" for="pwd-email">邮箱</label>
           <el-input
-            id="pwd-phone"
-            v-model="pwdForm.phone"
+            id="pwd-email"
+            v-model="pwdForm.email"
             size="large"
-            placeholder="请输入手机号"
-            maxlength="11"
-            inputmode="numeric"
-            autocomplete="tel"
+            placeholder="请输入邮箱地址"
+            maxlength="128"
+            inputmode="email"
+            autocomplete="email"
           >
             <template #prefix>
-              <el-icon :size="22"><Iphone /></el-icon>
+              <el-icon :size="22"><Message /></el-icon>
             </template>
           </el-input>
         </div>
@@ -478,7 +481,7 @@ function onCodeInput(value: string | Event) {
 
         <p v-if="USE_MOCK" class="login-form__hint login-form__hint--mock">
           演示模式：密码只保存在本机（加密存储、非明文），符合 6
-          位以上格式即可；新手机号请点上面的“注册并登录”
+          位以上格式即可；新邮箱请点上面的“注册并登录”
         </p>
       </form>
 

@@ -33,7 +33,7 @@ beforeEach(() => {
     AUTH_SESSION_KEY,
     JSON.stringify({
       uid: TEST_UID,
-      phone: '13800000000',
+      email: 'test@example.com',
       name: '测试老人',
       token: 'tok',
       loginAt: '',
