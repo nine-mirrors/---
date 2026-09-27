@@ -14,7 +14,7 @@ import { useBpLogStore, avgReadings, triageBpLevel } from '@/stores/bpLog'
 import { BP_STEP, HR_STEP, HR_REST_LOW } from '@/constants/dict'
 import { RED_FLAG_SYMPTOMS, matchRedFlagKeywords } from '@/constants/clinical'
 import { classifyBp, isIsolatedLowDiastolic, BP_ISOLATED_LOW_DIA_TEXT } from '@/utils/nutrition'
-import { dial } from '@/utils/dial'
+import { isPhoneDevice } from '@/utils/dial'
 import { dateStr, formatRelTime } from '@/utils/date'
 import type { BpPeriod, BpLevel, BpReading, BpRecord } from '@/types'
 import BpReadingSections from './BpReadingSections.vue'
@@ -31,10 +31,8 @@ const emit = defineEmits<{
 
 const bpLog = useBpLogStore()
 
-// 拨号统一走全局 dial()：手机唤起拨号盘，电脑弹大字号码窗
-function call120() {
-  dial('120', { isEmergency120: true })
-}
+// 一键拨打 120 仅真机显示（电脑没有电话能力，只留文字提示）
+const canDial = isPhoneDevice()
 
 // —— 录入状态 ——
 // 第一次读数
@@ -530,9 +528,10 @@ const savedRelTime = computed(() => {
         <!-- 点中任一红旗症状：立即提示先打 120（不拦截保存，只强提醒） -->
         <p v-if="hasSelectedSymptom" class="bp-form__symptom-warn">
           <span class="bp-form__symptom-warn-text">出现这些情况可能很危险，建议先拨打 120</span>
-          <a class="bp-form__symptom-call" href="tel:120" @click.prevent="call120">
-            立即拨打 120
-          </a>
+          <a v-if="canDial" class="bp-form__symptom-call" href="tel:120">立即拨打 120</a>
+          <span v-else class="bp-form__symptom-call bp-form__symptom-call--text">
+            请用手机拨打 120
+          </span>
         </p>
       </div>
 
@@ -625,14 +624,16 @@ const savedRelTime = computed(() => {
       <!-- 底部 sticky 操作区：急症时 tel:120 红钮常显，与“好的”并排 -->
       <div class="bp-result__actions">
         <a
-          v-if="savedLevel === 'emergency'"
+          v-if="savedLevel === 'emergency' && canDial"
           class="bp-result__call"
           href="tel:120"
           aria-label="血压很高，人不舒服先打 120"
-          @click.prevent="call120"
         >
           血压很高，先打 120
         </a>
+        <span v-else-if="savedLevel === 'emergency'" class="bp-result__call bp-result__call--text">
+          血压很高，请立刻用手机拨打 120
+        </span>
         <el-button size="large" @click="handleClose">好的</el-button>
       </div>
     </div>

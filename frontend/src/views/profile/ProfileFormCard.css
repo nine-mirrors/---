@@ -1,7 +1,8 @@
 /* 表单分组卡容器：手机单列，桌面在 ≥1200 断点下变双列（见文件底部）。
-   padding-bottom 是给 fixed 保存浮条留的“容器内冗余”：浮条在表单底边进入
-   视口底部 220px 收缩区时才隐藏，窄屏浮条顶边距视口底 290px，临界时最后一张卡
-   底边会短暂落在浮条下方，故容器底内垫 80px 让卡底边始终先越过浮条顶 */
+   手机端保存浮条 fixed 贴底不占文档流，padding-bottom 给它留"容器内冗余"：
+   浮条在表单底边进入视口底部 220px 收缩区时才隐藏，临界时最后一张卡底边会短暂
+   落在浮条下方，故底内垫 80px 让卡底边始终先越过浮条顶。
+   桌面端浮条回到文档流（见文件底部），此留白在 ≥1200 断点清零。 */
 .profile-form {
   display: flex;
   flex-direction: column;
@@ -413,11 +414,14 @@
    不用 grid 固定行：行轨道会把短卡（如仅两个字段的紧急联系人）下方锁出大片空白；
    flex 列内卡片首尾相接，只在较矮列的列底留白，消除红框式空洞。
    左列 ①③（基本信息+活动生活），右列 ②④⑤（紧急联系人+饮食+健康），两列总高接近。
-   浮条为 fixed 不参与排布。 */
+   保存条桌面为 static，wrap 后独占第三行。 */
 @media (min-width: 1200px) {
   .profile-form {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: flex-start;
+    /* 桌面保存条回到文档流，不再需要为 fixed 浮条预留底部冗余 */
+    padding-bottom: 0;
   }
 
   .profile-form__col {
@@ -437,21 +441,35 @@
     order: initial;
   }
 
-  /* 桌面无 tabbar/悬浮件在内容区左侧：浮条随侧栏宽度定位、右侧避让 AI 悬浮球，
-     保存按钮靠右收窄 */
-  .form-save-bar {
-    right: 112px;
-    bottom: 24px;
-    left: calc(var(--sider-width) + 24px);
+  /* 桌面不使用 fixed 浮条：它会在表单滚走后仍盖住下方"账号与数据"等卡片。
+     保存条独占一行排在两列之下（wrap 换行），物理上不可能遮挡任何内容；
+     is-visible 由观察器切换，这里对两种状态统一复位，不再依赖 JS 显隐。 */
+  .form-save-bar,
+  .form-save-bar.is-visible {
+    position: static;
+    flex: 0 0 100%;
+    /* 条本身是普通 block，el-button 为 inline-flex 导致 margin-left:auto 失效；
+       flex 右对齐还原原 fixed 浮条"按钮靠右收窄 320px"的视觉 */
+    display: flex;
+    justify-content: flex-end;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
   }
 
   .form-save-bar__btn {
     width: min(320px, 50%);
     margin-left: auto;
-  }
-
-  /* 侧栏折叠时浮条左缘跟随收窄后的侧栏（关在桌面断点内，窄屏侧栏隐藏不生效） */
-  :global(.app-layout--sider-collapsed) .form-save-bar {
-    left: calc(var(--sider-width-collapsed) + 24px);
   }
 }

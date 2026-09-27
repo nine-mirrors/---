@@ -13,7 +13,7 @@ import { useRouter } from 'vue-router'
 import { ArrowDown, Phone } from '@element-plus/icons-vue'
 import { nsRead, nsWrite } from '@/utils/storage'
 import { isPhone } from '@/utils/account'
-import { dial } from '@/utils/dial'
+import { isPhoneDevice } from '@/utils/dial'
 import { useProfileStore } from '@/stores/profile'
 import { RED_FLAG_SYMPTOMS } from '@/constants/clinical'
 import type { BpLevel } from '@/types'
@@ -21,16 +21,9 @@ import type { BpLevel } from '@/types'
 const router = useRouter()
 const profileStore = useProfileStore()
 
-// 拨号统一走全局 dial()：手机唤起拨号盘，电脑由 DialFallbackDialog 弹大字号码窗，
-// 避免电脑无 tel: 处理器时点击静默无反应
-function call120() {
-  dial('120', { isEmergency120: true })
-}
-
-function callEmergencyContact() {
-  if (!emergencyContact.value) return
-  dial(emergencyContact.value.phone, { name: emergencyContact.value.name })
-}
+// 一键拨号只在真机上出现：电脑/平板没有电话能力，不渲染按钮，只给文字提示，
+// 避免老人在电脑上点了没反应、以为功能坏了
+const canDial = isPhoneDevice()
 
 // 紧急联系人：在“我的”页设置；姓名+11 位手机号齐全才出现一键拨号
 const emergencyContact = computed<{ name: string; phone: string } | null>(() => {
@@ -191,22 +184,26 @@ onMounted(() => {
           <li v-for="symptom in RED_FLAG_SYMPTOMS" :key="symptom.id">{{ symptom.label }}</li>
         </ul>
         <div ref="symptomCallsEl" class="emergency-panel__calls">
+          <!-- 真机：tel: 唤起系统拨号盘 -->
           <a
+            v-if="canDial"
             class="emergency-panel__call"
             href="tel:120"
             aria-label="立即拨打 120 急救电话"
-            @click.prevent="call120"
           >
             <el-icon :size="26"><Phone /></el-icon>
             <span>立即拨打 120</span>
           </a>
-          <!-- 已设置紧急联系人：与 120 并列的一键拨号（次级白底，不抢 120 主操作） -->
+          <!-- 电脑/平板不能打电话：不给假按钮，直接提示用手机 -->
+          <p v-else class="emergency-panel__dial-note emergency-panel__dial-note--120">
+            请立刻用<strong>手机拨打 120</strong> 急救电话
+          </p>
+          <!-- 已设置紧急联系人：真机一键拨号（次级白底，不抢 120 主操作） -->
           <a
-            v-if="emergencyContact"
+            v-if="canDial && emergencyContact"
             class="emergency-panel__call-contact"
             :href="`tel:${emergencyContact.phone}`"
             :aria-label="`拨打紧急联系人 ${emergencyContact.name} ${emergencyContact.phone}`"
-            @click.prevent="callEmergencyContact"
           >
             <el-icon :size="24"><Phone /></el-icon>
             <span class="emergency-panel__call-contact-text">
@@ -214,6 +211,11 @@ onMounted(() => {
               <small>{{ emergencyContact.phone }}</small>
             </span>
           </a>
+          <!-- 非真机但已设置：把号码给全，家人可照着用手机拨 -->
+          <p v-else-if="emergencyContact" class="emergency-panel__dial-note">
+            紧急联系人：{{ emergencyContact.name }} <strong>{{ emergencyContact.phone }}</strong
+            >，请用手机拨打
+          </p>
           <!-- 未设置：引导去“我的”添加，不阻断 120 -->
           <button
             v-else
@@ -248,23 +250,25 @@ onMounted(() => {
         </button>
       </div>
 
-      <!-- 数值急症：120 红钮无条件常显（56px），不要求先勾选症状 -->
+      <!-- 数值急症：120 入口（真机为 56px 红钮；非真机为提示文字） -->
       <div class="emergency-panel__calls">
         <a
+          v-if="canDial"
           class="emergency-panel__call"
           href="tel:120"
           aria-label="立即拨打 120 急救电话"
-          @click.prevent="call120"
         >
           <el-icon :size="26"><Phone /></el-icon>
           <span>立即拨打 120</span>
         </a>
+        <p v-else class="emergency-panel__dial-note emergency-panel__dial-note--120">
+          请立刻用<strong>手机拨打 120</strong> 急救电话
+        </p>
         <a
-          v-if="emergencyContact"
+          v-if="canDial && emergencyContact"
           class="emergency-panel__call-contact"
           :href="`tel:${emergencyContact.phone}`"
           :aria-label="`拨打紧急联系人 ${emergencyContact.name} ${emergencyContact.phone}`"
-          @click.prevent="callEmergencyContact"
         >
           <el-icon :size="24"><Phone /></el-icon>
           <span class="emergency-panel__call-contact-text">
@@ -272,6 +276,10 @@ onMounted(() => {
             <small>{{ emergencyContact.phone }}</small>
           </span>
         </a>
+        <p v-else-if="emergencyContact" class="emergency-panel__dial-note">
+          紧急联系人：{{ emergencyContact.name }} <strong>{{ emergencyContact.phone }}</strong
+          >，请用手机拨打
+        </p>
         <button v-else type="button" class="emergency-panel__contact-setup" @click="goSetupContact">
           还没设置紧急联系人？点这里去“我的”添加家人电话
         </button>
@@ -446,6 +454,31 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+}
+
+/* 非真机（电脑/平板）不显示拨号按钮，用醒目但不可点的提示文字替代 */
+.emergency-panel__dial-note {
+  margin: 0;
+  padding: var(--space-md);
+  font-size: calc(var(--font-size-base) * 1.15);
+  font-weight: 600;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--color-danger-text);
+  background-color: #fff;
+  border: 1px dashed color-mix(in srgb, var(--color-danger) 45%, var(--color-border));
+  border-radius: var(--radius-md);
+}
+
+.emergency-panel__dial-note strong {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.emergency-panel__dial-note--120 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  background-color: var(--color-danger-bg);
+  border-style: solid;
 }
 
 .emergency-panel__call {

@@ -22,6 +22,7 @@ import { chatWithAi } from '@/api/ai'
 import { buildSystemPrompt } from '@/utils/aiPrompt'
 import { readAiContext } from '@/utils/aiChat'
 import { renderAiRichText } from '@/utils/aiSafety'
+import { isPhoneDevice } from '@/utils/dial'
 import { useSpeechRecognition } from '@/composables/useSpeechRecognition'
 import { useSpeech, requestSpeak } from '@/composables/useSpeech'
 import type { AiMessage } from '@/types/ai'
@@ -34,10 +35,10 @@ interface UiMessage {
 
 /**
  * assistant 气泡正文：统一走 aiSafety 的安全迷你 markdown（h() VNode，严禁 v-html）。
- * “拨打 120”急症语境由 renderAiRichText(linkify120) 渲染为 tel:120 链接，本组件不再自留正则。
+ * “拨打 120”急症语境仅在真机渲染为 tel:120 链接；电脑无电话能力，保持纯文本。
  */
 const AssistantRich = (props: { content: string }): VNodeChild =>
-  renderAiRichText(props.content, { linkify120: true })
+  renderAiRichText(props.content, { linkify120: isPhoneDevice() })
 
 /** 首次引导气泡：全局 localStorage 键（气泡消失/点球打开面板后写入） */
 const BUBBLE_SEEN_KEY = 'ndh_ai_bubble_seen_v1'

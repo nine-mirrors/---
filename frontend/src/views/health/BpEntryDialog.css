@@ -297,6 +297,16 @@
   background-color: var(--color-danger-text);
 }
 
+/* 非真机：同句提示文字，不做按钮样式，避免老人以为可点 */
+.bp-form__symptom-call--text {
+  color: var(--color-danger-text);
+  background: none;
+}
+
+.bp-form__symptom-call--text:hover {
+  background: none;
+}
+
 .bp-form__low-note {
   margin: 0;
   padding: var(--space-md);
@@ -495,6 +505,15 @@
   background-color: var(--color-danger-text);
   outline: 3px solid color-mix(in srgb, var(--color-danger) 30%, #ffffff);
   outline-offset: 2px;
+}
+
+/* 非真机：急症提示文字，浅红底红描边，不像按钮、不可点 */
+.bp-result__call--text,
+.bp-result__call--text:hover {
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, #ffffff);
+  outline: none;
 }
 
 /* “我没有不舒服”次要按钮：点击区 ≥44px */

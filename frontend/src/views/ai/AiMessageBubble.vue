@@ -2,10 +2,11 @@
 // 单条气泡：附件渲染（图片缩略图 84px 可 el-image 预览 / 文件 chip）+ 正文；
 // assistant 非 pending 气泡下挂赞、踩（二态高亮）与"重新生成"。
 // 正文统一走 aiSafety 的安全迷你 markdown（h() VNode，严禁 v-html/innerHTML）：
-// 只认 **加粗**、无序列表、有序列表、空行分段；120 仅在急症语境生成 tel:120 链接。
+// 只认 **加粗**、无序列表、有序列表、空行分段；120 仅真机急症语境生成 tel:120 链接。
 import { computed, h, type VNodeChild } from 'vue'
 import { Document, Picture, RefreshRight, VideoPause } from '@element-plus/icons-vue'
 import { renderAiRichText } from '@/utils/aiSafety'
+import { isPhoneDevice } from '@/utils/dial'
 import { useSpeech, requestSpeak } from '@/composables/useSpeech'
 import type { AiAttachment, AiFeedback, ChatMessage } from '@/types/ai'
 
@@ -86,7 +87,7 @@ function toggleReadAloud(): void {
     <BubbleRich
       v-if="message.content"
       :content="message.content"
-      :linkify="message.role === 'assistant'"
+      :linkify="message.role === 'assistant' && isPhoneDevice()"
     />
 
     <!-- assistant 操作行（pending/error 由列表组件处理，不会走到这里） -->
