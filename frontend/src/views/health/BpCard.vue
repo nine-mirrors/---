@@ -36,6 +36,8 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   openEntry: []
+  /** 急症面板展开/收起：Health 页据此解除或恢复桌面一屏锁高 */
+  emergencyExpanded: [open: boolean]
 }>()
 
 const router = useRouter()
@@ -388,7 +390,11 @@ const { el } = useEcharts(() => {
 <template>
   <DemoCard title="血压" :subtitle="subtitle">
     <!-- 急诊条（卡顶）：emergency-key 为最新急症记录标识，已确认过的同一条不重弹 -->
-    <EmergencyPanel :emergency-key="latestEmergencyKey" :latest-level="latestLevel" />
+    <EmergencyPanel
+      :emergency-key="latestEmergencyKey"
+      :latest-level="latestLevel"
+      @expanded-change="(open) => emit('emergencyExpanded', open)"
+    />
 
     <!-- 断连提示：设备未连接时仅隐藏模拟曲线，手动记录与录入仍可用 -->
     <div

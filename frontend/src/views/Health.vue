@@ -25,6 +25,10 @@ const deviceData = ref<DeviceData>({ days: {} })
 const manualRecords = ref<BpRecord[]>([])
 const entryOpen = ref(false)
 
+// 急症面板展开时桌面一屏仪表盘会装不下（血压卡锁高后图表被压成 0、按钮溢出卡外），
+// 收到 BpCard 通知后给页面加类，解除锁高改自然滚动；收起后恢复
+const emergencyOpen = ref(false)
+
 // 每次进入页面重新读取：保存餐次回来能看到血压的新值
 async function refresh() {
   deviceData.value = await getDeviceData()
@@ -91,7 +95,7 @@ async function handleManualSaved() {
 </script>
 
 <template>
-  <div class="page-container health-page">
+  <div class="page-container health-page" :class="{ 'health-page--emergency': emergencyOpen }">
     <header class="health-header">
       <h1 class="health-title">健康数据</h1>
       <p class="health-subtitle">
@@ -106,6 +110,7 @@ async function handleManualSaved() {
         :week="week"
         :manual-records="manualRecords"
         @open-entry="entryOpen = true"
+        @emergency-expanded="emergencyOpen = $event"
       />
 
       <div class="health-grid__row">
@@ -328,6 +333,47 @@ async function handleManualSaved() {
   /* 睡眠卡一屏内只留深浅睡百分比，名词解释让位给高度 */
   .health-grid :deep(.legend__desc) {
     display: none;
+  }
+
+  /* —— 急症面板展开（症状列表展开 / 数值红条出现）时，血压卡内容天然超过一屏。
+        继续锁高会把弹性图表压成 0、其余内容溢出卡片被 overflow:hidden 裁掉（"出界"）。
+        此时解除一屏锁定：页面恢复自然高度与滚动，栅格行与卡片按内容排布，
+        图表/圆环回到固定尺寸；面板收起后本规则整体失效，自动回到一屏仪表盘。 —— */
+  .health-page--emergency {
+    height: auto;
+    overflow: visible;
+  }
+
+  .health-page--emergency .health-grid {
+    flex: none;
+    grid-template-rows: auto auto;
+    gap: 24px;
+  }
+
+  .health-page--emergency .health-grid__wide,
+  .health-page--emergency .health-grid__row > *,
+  .health-page--emergency .health-grid > :not(.health-grid__wide):not(.health-grid__row) {
+    min-height: auto;
+  }
+
+  .health-page--emergency .health-grid :deep(.chart--bp) {
+    flex: 0 0 auto;
+    height: 260px;
+  }
+
+  .health-page--emergency .health-grid :deep(.chart--weight) {
+    flex: 0 0 auto;
+    height: 220px;
+  }
+
+  .health-page--emergency .health-grid :deep(.ring) {
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+
+  .health-page--emergency .health-grid :deep(.ring__svg) {
+    width: clamp(120px, 38vw, 160px);
+    height: clamp(120px, 38vw, 160px);
   }
 }
 </style>

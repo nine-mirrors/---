@@ -47,6 +47,12 @@ const props = withDefaults(
   { emergencyKey: null, latestLevel: null },
 )
 
+const emit = defineEmits<{
+  /** 急症内容是否正在占用大块高度（症状面板展开 或 数值红条显示）：
+      桌面一屏仪表盘布局据此解除锁高、改自然滚动，避免内容溢出卡片 */
+  (e: 'expanded-change', expanded: boolean): void
+}>()
+
 // —— 症状急症入口（常驻，默认折叠） ——
 const symptomOpen = ref(false)
 
@@ -67,6 +73,17 @@ const numericBarVisible = computed(
 
 // 仅最新一次读数已回到 normal 才允许关闭；high 及以上不显示关闭钮，只保留复测引导
 const canDismiss = computed(() => props.latestLevel === 'normal')
+
+// 任一急症入口处于展开/显示态：通知父层解除一屏锁高（症状面板可随时开合，
+// 数值红条可能在进页面时就已存在，故挂载后也要发一次初始态）
+const anyExpanded = computed(() => symptomOpen.value || numericBarVisible.value)
+
+watch(
+  anyExpanded,
+  (expanded) => emit('expanded-change', expanded),
+  // 症状折叠↔展开、红条出现/关闭都走这个计算属性，无需分别监听
+  { immediate: true },
+)
 
 function dismissNumeric() {
   if (!canDismiss.value || !props.emergencyKey) return
