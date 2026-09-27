@@ -14,6 +14,7 @@ import { useBpLogStore, avgReadings, triageBpLevel } from '@/stores/bpLog'
 import { BP_STEP, HR_STEP, HR_REST_LOW } from '@/constants/dict'
 import { RED_FLAG_SYMPTOMS, matchRedFlagKeywords } from '@/constants/clinical'
 import { classifyBp, isIsolatedLowDiastolic, BP_ISOLATED_LOW_DIA_TEXT } from '@/utils/nutrition'
+import { dial } from '@/utils/dial'
 import { dateStr, formatRelTime } from '@/utils/date'
 import type { BpPeriod, BpLevel, BpReading, BpRecord } from '@/types'
 import BpReadingSections from './BpReadingSections.vue'
@@ -29,6 +30,11 @@ const emit = defineEmits<{
 }>()
 
 const bpLog = useBpLogStore()
+
+// 拨号统一走全局 dial()：手机唤起拨号盘，电脑弹大字号码窗
+function call120() {
+  dial('120', { isEmergency120: true })
+}
 
 // —— 录入状态 ——
 // 第一次读数
@@ -524,7 +530,9 @@ const savedRelTime = computed(() => {
         <!-- 点中任一红旗症状：立即提示先打 120（不拦截保存，只强提醒） -->
         <p v-if="hasSelectedSymptom" class="bp-form__symptom-warn">
           <span class="bp-form__symptom-warn-text">出现这些情况可能很危险，建议先拨打 120</span>
-          <a class="bp-form__symptom-call" href="tel:120"> 立即拨打 120 </a>
+          <a class="bp-form__symptom-call" href="tel:120" @click.prevent="call120">
+            立即拨打 120
+          </a>
         </p>
       </div>
 
@@ -621,6 +629,7 @@ const savedRelTime = computed(() => {
           class="bp-result__call"
           href="tel:120"
           aria-label="血压很高，人不舒服先打 120"
+          @click.prevent="call120"
         >
           血压很高，先打 120
         </a>

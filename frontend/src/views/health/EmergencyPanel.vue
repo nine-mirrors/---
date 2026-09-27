@@ -13,12 +13,24 @@ import { useRouter } from 'vue-router'
 import { ArrowDown, Phone } from '@element-plus/icons-vue'
 import { nsRead, nsWrite } from '@/utils/storage'
 import { isPhone } from '@/utils/account'
+import { dial } from '@/utils/dial'
 import { useProfileStore } from '@/stores/profile'
 import { RED_FLAG_SYMPTOMS } from '@/constants/clinical'
 import type { BpLevel } from '@/types'
 
 const router = useRouter()
 const profileStore = useProfileStore()
+
+// 拨号统一走全局 dial()：手机唤起拨号盘，电脑由 DialFallbackDialog 弹大字号码窗，
+// 避免电脑无 tel: 处理器时点击静默无反应
+function call120() {
+  dial('120', { isEmergency120: true })
+}
+
+function callEmergencyContact() {
+  if (!emergencyContact.value) return
+  dial(emergencyContact.value.phone, { name: emergencyContact.value.name })
+}
 
 // 紧急联系人：在“我的”页设置；姓名+11 位手机号齐全才出现一键拨号
 const emergencyContact = computed<{ name: string; phone: string } | null>(() => {
@@ -179,7 +191,12 @@ onMounted(() => {
           <li v-for="symptom in RED_FLAG_SYMPTOMS" :key="symptom.id">{{ symptom.label }}</li>
         </ul>
         <div ref="symptomCallsEl" class="emergency-panel__calls">
-          <a class="emergency-panel__call" href="tel:120" aria-label="立即拨打 120 急救电话">
+          <a
+            class="emergency-panel__call"
+            href="tel:120"
+            aria-label="立即拨打 120 急救电话"
+            @click.prevent="call120"
+          >
             <el-icon :size="26"><Phone /></el-icon>
             <span>立即拨打 120</span>
           </a>
@@ -189,6 +206,7 @@ onMounted(() => {
             class="emergency-panel__call-contact"
             :href="`tel:${emergencyContact.phone}`"
             :aria-label="`拨打紧急联系人 ${emergencyContact.name} ${emergencyContact.phone}`"
+            @click.prevent="callEmergencyContact"
           >
             <el-icon :size="24"><Phone /></el-icon>
             <span class="emergency-panel__call-contact-text">
@@ -232,7 +250,12 @@ onMounted(() => {
 
       <!-- 数值急症：120 红钮无条件常显（56px），不要求先勾选症状 -->
       <div class="emergency-panel__calls">
-        <a class="emergency-panel__call" href="tel:120" aria-label="立即拨打 120 急救电话">
+        <a
+          class="emergency-panel__call"
+          href="tel:120"
+          aria-label="立即拨打 120 急救电话"
+          @click.prevent="call120"
+        >
           <el-icon :size="26"><Phone /></el-icon>
           <span>立即拨打 120</span>
         </a>
@@ -241,6 +264,7 @@ onMounted(() => {
           class="emergency-panel__call-contact"
           :href="`tel:${emergencyContact.phone}`"
           :aria-label="`拨打紧急联系人 ${emergencyContact.name} ${emergencyContact.phone}`"
+          @click.prevent="callEmergencyContact"
         >
           <el-icon :size="24"><Phone /></el-icon>
           <span class="emergency-panel__call-contact-text">

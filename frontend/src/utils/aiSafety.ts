@@ -17,6 +17,7 @@ import {
   MEDICATION_DISCLAIMER,
   matchRedFlagKeywords,
 } from '@/constants/clinical'
+import { dial } from '@/utils/dial'
 
 /* ================================ 急症识别 ================================ */
 
@@ -334,7 +335,22 @@ function telSegments(text: string, linkify: boolean): Array<string | VNode> {
     if (typeof segment === 'string') {
       nodes.push(segment)
     } else {
-      nodes.push(h('a', { href: 'tel:120', class: 'ai-md__tel', rel: 'nofollow' }, '拨打 120'))
+      nodes.push(
+        h(
+          'a',
+          {
+            href: 'tel:120',
+            class: 'ai-md__tel',
+            rel: 'nofollow',
+            // 统一走拨号服务：手机唤起拨号盘，电脑弹全局号码窗，避免静默无反应
+            onClick: (e: MouseEvent) => {
+              e.preventDefault()
+              dial('120', { isEmergency120: true })
+            },
+          },
+          '拨打 120',
+        ),
+      )
     }
   }
   return nodes

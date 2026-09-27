@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import RouteErrorBoundary from '@/components/common/RouteErrorBoundary.vue'
+import DialFallbackDialog from '@/components/common/DialFallbackDialog.vue'
 import AiAssistant from '@/components/ai/AiAssistant.vue'
 import { routeLoading } from '@/router'
 
@@ -32,6 +33,9 @@ const showAiAssistant = computed(
 
     <!-- AI 营养师悬浮球：登录页与 onboarding 引导流程不渲染，z-index 低于 routeLoading 遮罩 -->
     <AiAssistant v-if="showAiAssistant" />
+
+    <!-- 全局拨号兜底：电脑等无电话能力设备点 tel: 时弹大字号码窗（全应用唯一） -->
+    <DialFallbackDialog />
 
     <!--
       守卫异步加载期间的"正在进入…"全屏遮罩（AC-28）。
