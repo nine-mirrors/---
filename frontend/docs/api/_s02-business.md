@@ -561,5 +561,5 @@ mock 专属写入侧（真实模式 no-op）：`ensureDeviceData(profile)`（播
 5. **食材库 id 同源**：前端内置 `src/mock/foods.ts`（提取自《中国食物成分表第6版》转录集），真实模式下识别结果展示、份量快捷档、手动搜索兜底都按 id 查这份表。`/api/foods/search` 与 `/api/recognize` 返回的食物 `id` 需与前端食材库同源一致，否则会出现有 id 无名称/无份量档。
 6. **部署开关**：联调/正式部署时将 `.env.production` 的 `VITE_USE_MOCK` 改为 `false` 并删除 `VITE_ALLOW_MOCK_BUILD=true` 放行行。
 7. **设备连接状态**（蓝牙血压计/手环/体脂秤/餐盘的连接/断开）纯本机维护，无后端端点；`GET /api/device-data` 只回传体征数据。
-8. **存储与多用户隔离（2026-09-26 决议）**：用户产生的数据全部进 SQLite 关系表（建议 SQLAlchemy），不要用 JSON 文件按 uid 命名空间——那只是前端 localStorage mock 的模拟方式。所有业务表带 `uid` 外键（`REFERENCES users(id) ON DELETE CASCADE`）并记得 `PRAGMA foreign_keys=ON`；所有查询强制 `WHERE uid = 当前用户`。JSON 文件只放只读种子（食材库、食谱库）。建议首批表：`users / profiles（一对一，23 字段见 §4）/ meals + meal_items / bp_logs / medication_records / device_days`。
+8. **存储与多用户隔离（2026-09-26 决议）**：用户产生的数据全部进 SQLite 关系表（建议 SQLAlchemy），不要用 JSON 文件按 uid 命名空间——那只是前端 localStorage mock 的模拟方式。所有业务表带字符串 `uid` 外键（`REFERENCES users(uid) ON DELETE CASCADE`，引用 users 的字符串 uid 列而非内部自增 id）并记得 `PRAGMA foreign_keys=ON`；所有查询强制 `WHERE uid = 当前用户`。JSON 文件只放只读种子（食材库、食谱库）。建议首批表：`users / profiles（一对一，23 字段见 §4）/ meals + meal_items / bp_logs / medication_records / device_days`。
 9. **响应不要 envelope、token 用 JWT**：成功直接返回裸数据，错误体仅 `{code,message}`（§1.2）；JWT HS256、30 天、无 refresh，见 S01 §1.2。
